@@ -1,0 +1,21 @@
+{
+  "name": "sparks-services",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^2.0.3",
+    "typings": "^1.4.0"
+  },
+  "dependencies": {
+    "apex.js": "^2.0.0",
+    "firebase": "^3.4.1",
+    "ramda": "^0.22.1",
+    "source-map-support": "^0.4.3"
+  }
+}

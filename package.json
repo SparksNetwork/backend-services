@@ -14,8 +14,13 @@
   },
   "dependencies": {
     "apex.js": "^2.0.0",
+    "aws-sdk": "^2.6.6",
     "firebase": "^3.4.1",
+    "kinesis": "^1.2.2",
+    "kinesis-readable": "^1.0.0",
     "ramda": "^0.22.1",
-    "source-map-support": "^0.4.3"
+    "source-map-support": "^0.4.3",
+    "sparks-schemas": "github:sparksnetwork/schemas",
+    "unique-stream": "^2.2.1"
   }
 }

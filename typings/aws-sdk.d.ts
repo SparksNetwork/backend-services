@@ -64,7 +64,7 @@ declare namespace Kinesis {
     Limit?: number;
   }
 
-  interface Record {
+  export interface Record {
     SequenceNumber: string;
     ApproximateArrivalTimestamp?: Date;
     Data: Buffer;

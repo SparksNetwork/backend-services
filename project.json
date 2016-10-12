@@ -4,5 +4,9 @@
   "memory": 128,
   "timeout": 5,
   "role": "arn:aws:iam::878160042194:role/sparks_lambda_function",
-  "environment": {}
+  "environment": {},
+  "runtime": "nodejs4.3",
+  "hooks": {
+    "build": "tsc"
+  }
 }

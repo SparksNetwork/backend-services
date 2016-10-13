@@ -1,2 +1,5 @@
 .env
 credentials.json
+functions/**/*.js
+lib/**/*.js
+test/**/*.js

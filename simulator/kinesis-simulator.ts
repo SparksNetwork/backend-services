@@ -1,3 +1,6 @@
+/**
+ * Script to run a function locally.
+ */
 import Shard = Kinesis.Shard;
 import * as aws from 'aws-sdk';
 import ShardRecord = Kinesis.Record;

@@ -1,5 +1,8 @@
 {
   "globalDependencies": {
     "node": "registry:env/node#6.0.0+20160918225031"
+  },
+  "dependencies": {
+    "sinon": "registry:npm/sinon#1.16.0+20160723033700"
   }
 }

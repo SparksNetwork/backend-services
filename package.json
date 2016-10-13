@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "ava": "^0.16.0",
+    "sinon": "^1.17.6",
     "typescript": "^2.0.3",
     "typings": "^1.4.0"
   },

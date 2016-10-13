@@ -2,21 +2,18 @@ import {Readable} from 'stream';
 import Record = Kinesis.Record;
 import {Kinesis} from "aws-sdk";
 
+/**
+ * Create a readable stream from a kinesis shard
+ */
 export default class ShardStream extends Readable {
-  private client:Kinesis;
-  private shardId:string;
   private nextIterator:string;
-  private waitingRecords:Record[];
+  private waitingRecords:Record[] = [];
 
-  constructor(client, shardId) {
+  constructor(private client:Kinesis, private shardId:string) {
     super({
       objectMode: true,
       highWaterMark: 100
     });
-
-    this.client = client;
-    this.shardId = shardId;
-    this.waitingRecords = [];
   }
 
   private getIterator() {

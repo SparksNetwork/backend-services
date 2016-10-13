@@ -1,8 +1,31 @@
 declare namespace Kinesis {
+  interface Options {
+    apiVersion?:string;
+    params?:any;
+    endpoint?:string;
+    accessKeyId?:string;
+    secretAccessKey?:string;
+    sessionToken?:string;
+    credentials?:any;
+    credentialProvider?:any;
+    region?:string;
+    maxRetries?:number;
+    maxRedirects?:number;
+    sslEnabled?:boolean;
+    paramValidation?:any;
+    convertResponseTypes?:boolean;
+    correctClockSkew?:boolean;
+    httpOptions?: {
+      proxy?:string;
+      agent?:any;
+      timeout?:number;
+    };
+  }
+
   interface PutRecordParams {
     Data: Buffer;
-    PartitionKey: string;
-    StreamName: string;
+    PartitionKey?: string;
+    StreamName?: string;
   }
 
   interface PutRecordResponse {
@@ -104,7 +127,7 @@ declare module 'aws-sdk' {
   }
 
   export class Kinesis {
-    constructor(options?: any);
+    constructor(options?: Kinesis.Options);
 
     putRecord(params: Kinesis.PutRecordParams,
               callback?: Callback<Kinesis.PutRecordResponse>): Response<Kinesis.PutRecordResponse>;

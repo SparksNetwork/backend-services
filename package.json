@@ -10,6 +10,7 @@
   "license": "ISC",
   "devDependencies": {
     "ava": "^0.16.0",
+    "aws-sdk-mock": "^1.5.0",
     "sinon": "^1.17.6",
     "typescript": "^2.0.3",
     "typings": "^1.4.0"
@@ -18,8 +19,10 @@
     "apex.js": "^2.0.0",
     "aws-sdk": "^2.6.6",
     "firebase": "^3.4.1",
+    "firebase-get": "github:jemmyw/firebase-get",
     "kinesis": "^1.2.2",
     "kinesis-readable": "^1.0.0",
+    "node-uuid": "^1.4.7",
     "ramda": "^0.22.1",
     "source-map-support": "^0.4.3",
     "sparks-schemas": "github:sparksnetwork/schemas",

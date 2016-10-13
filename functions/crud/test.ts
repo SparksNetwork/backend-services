@@ -1,16 +1,13 @@
-import {spy, stub, mock} from 'sinon'
+import {mock} from 'sinon'
 import Firebase from '../../lib/Firebase'
 import crud from './index';
 import {ArrivalsCreateCommand} from 'sparks-schemas/types/commands/ArrivalsCreate';
 import {CommitmentsUpdateCommand} from 'sparks-schemas/types/commands/CommitmentsUpdate';
 import {EngagementsRemoveCommand} from 'sparks-schemas/types/commands/EngagementsRemove';
-import {test} from "ava";
-import {SinonSpy} from "sinon";
-import {SinonStub} from "sinon";
-import {SinonMock} from "sinon";
-import {SinonExpectation} from "sinon";
+import {test, ContextualTestContext} from "ava";
 import {apex} from "../../test/apex";
-import {MockDatabase, MockFirebase} from "../../test/MockFirebase";
+import {MockFirebase} from "../../test/MockFirebase";
+import {Command} from "sparks-schemas/types/command";
 
 const createMessage:ArrivalsCreateCommand = {
   domain: "Arrivals",
@@ -23,6 +20,12 @@ const createMessage:ArrivalsCreateCommand = {
       projectKey: "def345"
     }
   }
+};
+const invalidCreateMessage:Command = {
+  domain: 'Arrivals',
+  action: 'create',
+  uid: 'abc123',
+  payload: {}
 };
 
 const updateMessage:CommitmentsUpdateCommand = {
@@ -37,6 +40,13 @@ const updateMessage:CommitmentsUpdateCommand = {
   }
 };
 
+const invalidUpdateMessage:Command = {
+  domain: 'Commitments',
+  action: 'update',
+  uid: 'abc123',
+  payload: {}
+};
+
 const removeMessage:EngagementsRemoveCommand = {
   domain: "Engagements",
   action: "remove",
@@ -46,16 +56,28 @@ const removeMessage:EngagementsRemoveCommand = {
   }
 };
 
+const invalidRemoveMessage:Command = {
+  domain: 'Engagements',
+  action: 'remove',
+  uid: 'abc123',
+  payload: {}
+};
+
 function makeRecord(message) {
   return {
     Data: JSON.stringify(message)
   }
 }
 
-const db = new MockFirebase();
-Firebase.establishConnection('crud', db);
+function dbtest(m:string, tfn:(t:ContextualTestContext, db:MockFirebase) => Promise<any>) {
+  return test(m, async function(t) {
+    const db = new MockFirebase();
+    Firebase.establishConnection('crud', db);
+    return await tfn(t, db);
+  });
+}
 
-test('create message', async function() {
+dbtest('create message', async function(t, db) {
   const m = mock(db.database().ref().child('Arrivals'));
   m.expects('push')
     .withArgs(createMessage.payload.values)
@@ -66,7 +88,16 @@ test('create message', async function() {
   m.verify();
 });
 
-test('update message', async function() {
+dbtest('invalid create message', async function(t, db) {
+  const m = mock(db.database().ref().child('Arrivals'));
+  m.expects('push').never();
+
+  t.throws(apex(crud, makeRecord(invalidCreateMessage)), 'Invalid payload');
+
+  m.verify();
+});
+
+dbtest('update message', async function(t, db) {
   const m = mock(db.database().ref()
     .child('Commitments')
     .child('cde234'));
@@ -81,16 +112,37 @@ test('update message', async function() {
   m.verify();
 });
 
-test('remove message', async function() {
+dbtest('invalid update message', async function(t, db) {
+  const m = mock(db.database().ref()
+    .child('Commitments'));
+  m.expects('child').never();
+
+  t.throws(apex(crud, makeRecord(invalidUpdateMessage)), 'Invalid payload');
+
+  m.verify();
+});
+
+dbtest('remove message', async function(t, db) {
   const m = mock(db.database().ref()
     .child('Engagements')
     .child('cde234'));
 
   m.expects('remove')
     .once()
-    .returns(Promise.resolve({}))
+    .returns(Promise.resolve({}));
 
   await apex(crud, makeRecord(removeMessage));
+
+  m.verify();
+});
+
+dbtest('invalid remove message', async function(t, db) {
+  const m = mock(db.database().ref()
+    .child('Engagements'));
+
+  m.expects('child').never();
+
+  t.throws(apex(crud, makeRecord(invalidRemoveMessage)), 'Invalid payload');
 
   m.verify();
 });

@@ -62,7 +62,7 @@ const remove = StreamTransform('Arrivals.remove', async function (message:Arriva
     partitionKey: message.uid,
     data: {
       domain: 'Arrivals',
-      type: 'remove',
+      action: 'remove',
       key: message.payload.key
     }
   }

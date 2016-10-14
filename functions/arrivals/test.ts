@@ -1,7 +1,8 @@
 import {spy, stub, mock} from 'sinon';
 import service from './index';
 import {test} from 'ava';
-import {ArrivalsCreateCommand, ArrivalsCreatePayload} from 'sparks-schemas/types/commands/ArrivalsCreate';
+import {ArrivalsCreateCommand} from 'sparks-schemas/types/commands/ArrivalsCreate';
+import {ArrivalsRemoveCommand} from 'sparks-schemas/types/commands/ArrivalsRemove';
 import KinesisFunction from "../../test/KinesisFunction";
 import {MockFirebase, MockSnapshot} from "../../test/MockFirebase";
 import {establishConnection} from "../../lib/Firebase";
@@ -15,8 +16,18 @@ establishConnection('arrivals', db);
 const AWS = require('aws-sdk-mock');
 test.beforeEach(() => AWS.restore());
 
-test.serial('create', async function(t) {
+async function StreamTransform(message, service, params?:{PartitionKey:string, StreamName:string}) {
   const putRecord = AWS.mock('Kinesis', 'putRecord');
+  await KinesisFunction(message, service);
+  const stub = putRecord.stub;
+  AWS.restore('Kinesis', 'putRecord');
+  if(!stub) { throw new Error('Sent no message'); }
+  if(stub.callCount > 1) { throw new Error(`Sent more than one message (${stub.callCount})`); }
+  const putRecordArgs = stub.firstCall.args[0];
+  return JSON.parse(putRecordArgs.Data);
+}
+
+test.serial('create', async function(t) {
   const now = spy(Date, 'now');
 
   const message:ArrivalsCreateCommand = {
@@ -31,14 +42,10 @@ test.serial('create', async function(t) {
     }
   };
 
-  await KinesisFunction(message, service);
-
-  t.is(putRecord.stub.callCount, 1);
-  const params = putRecord.stub.firstCall.args[0];
-  const data = JSON.parse(params.Data);
-
-  t.is(params.PartitionKey, 'abc123');
-  t.is(params.StreamName, 'internal.data');
+  const data = await StreamTransform(message, service, {
+    PartitionKey: 'abc123',
+    StreamName: 'internal.data'
+  });
 
   t.is(data.domain, 'Arrivals');
   t.is(data.action, 'create');
@@ -50,8 +57,6 @@ test.serial('create', async function(t) {
 });
 
 test.serial('create already arrived', async function(t) {
-  const putRecord = AWS.mock('Kinesis', 'putRecord');
-
   await db.database()
     .child('Arrivals')
     .child('-Kcj112--Kmop993')
@@ -69,6 +74,24 @@ test.serial('create already arrived', async function(t) {
     }
   };
 
-  t.throws(KinesisFunction(message, service), 'Already arrived');
-  t.falsy(putRecord.stub)
+  t.throws(StreamTransform(message, service), 'Already arrived');
+});
+
+test.serial('remove', async function(t) {
+  const message:ArrivalsRemoveCommand = {
+    domain: 'Arrivals',
+    action: 'remove',
+    uid: 'abc123',
+    payload: {
+      key: '-Kui88'
+    }
+  };
+
+  const data = await StreamTransform(message, service);
+
+  t.deepEqual(data, {
+    domain: 'Arrivals',
+    action: 'remove',
+    key: '-Kui88'
+  });
 });

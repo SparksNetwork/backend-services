@@ -60,3 +60,4 @@ function start() {
 start()
     .then(() => console.log('started'))
     .catch(err => console.error('[error]', err));
+//# sourceMappingURL=kinesis-simulator.js.map

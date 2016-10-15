@@ -3,3 +3,4 @@ credentials.json
 functions/**/*.js
 lib/**/*.js
 test/**/*.js
+**/*.map

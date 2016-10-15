@@ -1,31 +1,19 @@
-import {spy, stub, mock} from 'sinon';
+require('source-map-support').install();
+
+import {spy} from 'sinon';
 import service from './index';
 import {test} from 'ava';
 import {ArrivalsCreateCommand} from 'sparks-schemas/types/commands/ArrivalsCreate';
 import {ArrivalsRemoveCommand} from 'sparks-schemas/types/commands/ArrivalsRemove';
-import KinesisFunction from "../../test/KinesisFunction";
-import {MockFirebase, MockSnapshot} from "../../test/MockFirebase";
+import {MockFirebase} from "../../test/MockFirebase";
 import {establishConnection} from "../../lib/Firebase";
+import {StreamTransform} from "../../test/StreamTransform";
 
 const db = new MockFirebase();
 const userRef = db.database().child('Users').child('abc123');
 userRef.set('tyu678');
 
 establishConnection('arrivals', db);
-
-const AWS = require('aws-sdk-mock');
-test.beforeEach(() => AWS.restore());
-
-async function StreamTransform(message, service, params?:{PartitionKey:string, StreamName:string}) {
-  const putRecord = AWS.mock('Kinesis', 'putRecord');
-  await KinesisFunction(message, service);
-  const stub = putRecord.stub;
-  AWS.restore('Kinesis', 'putRecord');
-  if(!stub) { throw new Error('Sent no message'); }
-  if(stub.callCount > 1) { throw new Error(`Sent more than one message (${stub.callCount})`); }
-  const putRecordArgs = stub.firstCall.args[0];
-  return JSON.parse(putRecordArgs.Data);
-}
 
 test.serial('create', async function(t) {
   const now = spy(Date, 'now');
@@ -42,7 +30,7 @@ test.serial('create', async function(t) {
     }
   };
 
-  const data = await StreamTransform(message, service, {
+  const [{data}] = await StreamTransform(message, service, {
     PartitionKey: 'abc123',
     StreamName: 'internal.data'
   });
@@ -87,7 +75,7 @@ test.serial('remove', async function(t) {
     }
   };
 
-  const data = await StreamTransform(message, service);
+  const [{data}] = await StreamTransform(message, service);
 
   t.deepEqual(data, {
     domain: 'Arrivals',

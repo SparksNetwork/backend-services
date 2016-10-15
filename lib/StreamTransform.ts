@@ -1,12 +1,22 @@
 import {Kinesis} from 'aws-sdk';
 import {KinesisFunction} from "./KinesisFunction";
+import {groupBy, prop, toPairs, compose} from 'ramda'
 
-export interface Transformed<U> {
+export interface StreamRecord<U> {
   streamName:string;
   partitionKey:string;
   data:U;
 }
-export type Transform<T,U> = (message:T) => Promise<Transformed<U>>;
+
+export type Transform<T,U> = (message:T) => Promise<Array<StreamRecord<U>>>;
+
+function byStream<T>(records:StreamRecord<T>[]):[string, StreamRecord<T>[]][] {
+  return compose<StreamRecord<T>[], any, [string, StreamRecord<T>[]][]>(
+    toPairs,
+    groupBy<StreamRecord<T>>(prop('streamName'))
+  )(records);
+}
+
 
 /**
  * This indicates a function that takes a message from a kinesis stream and
@@ -24,13 +34,19 @@ export type Transform<T,U> = (message:T) => Promise<Transformed<U>>;
  */
 export function StreamTransform<T,U>(schema:string|Function, transform:Transform<T,U>) {
   return KinesisFunction<T>(schema, async function(message:T) {
-    const transformed:Transformed<U> = await transform(message);
-
+    const records:StreamRecord<U>[] = await transform(message);
     const kinesis = new Kinesis();
-    return await kinesis.putRecord({
-      PartitionKey: transformed.partitionKey,
-      Data: new Buffer(JSON.stringify(transformed.data)),
-      StreamName: transformed.streamName
-    }).promise();
+
+    return await Promise.all(
+      byStream(records).map(([streamName, records]) => {
+        return kinesis.putRecords({
+          StreamName: streamName as string,
+          Records: records.map(record => ({
+            PartitionKey: record.partitionKey,
+            Data: new Buffer(JSON.stringify(record.data))
+          }))
+        }).promise()
+      })
+    );
   });
 }

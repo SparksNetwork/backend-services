@@ -2,7 +2,7 @@ import {apex} from "./apex";
 
 function makeRecord(message) {
   return {
-    Data: JSON.stringify(message)
+    Data: new Buffer(JSON.stringify(message))
   }
 }
 

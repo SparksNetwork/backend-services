@@ -1,6 +1,7 @@
+import {toPairs, fromPairs, compose, sortBy, prop, nth, propEq, filter} from 'ramda';
+
 export class MockSnapshot {
   constructor(private _key:string, private _val:any) {
-
   }
 
   get key() { return this._key; }
@@ -9,9 +10,11 @@ export class MockSnapshot {
 
 export class MockRef {
   private _refs:{[index:string]:MockRef};
-  private _values:any;
+  protected _values:any;
 
-  constructor(private parent:MockRef, private key:string) {
+  get values() { return this._values; }
+
+  constructor(protected parent:MockRef, protected key:string) {
     this._refs = {};
   }
 
@@ -47,8 +50,52 @@ export class MockRef {
 
   once(type:string) {
     if (type === 'value') {
-      return Promise.resolve(new MockSnapshot(this.key, this._values));
+      return Promise.resolve(new MockSnapshot(this.key, this.values));
     }
+  }
+
+  orderByChild(key:string) {
+    const ref = new RefOrderedByChild(this.parent, this.key, key);
+    ref.set(this.values);
+    return ref;
+  }
+}
+
+export class RefOrderedByChild extends MockRef {
+  constructor(parent:MockRef, key:string, protected childKey:string) {
+    super(parent, key);
+  }
+
+  get values() {
+    return compose(
+      fromPairs,
+      sortBy(compose<any,any,any>(prop(this.childKey), nth(1))),
+      toPairs
+    )(this._values);
+  }
+
+  equalTo(value:any) {
+    const ref = new RefOrderedByChildEqualTo(this.parent, this.key, this.childKey, value);
+    ref.set(this.values);
+    return ref;
+  }
+}
+
+export class RefOrderedByChildEqualTo extends RefOrderedByChild {
+  constructor(parent:MockRef, key:string, childKey:string, private childValue:any) {
+    super(parent, key, childKey);
+  }
+
+  private get filter() {
+    return compose(
+      fromPairs,
+      filter(compose(propEq(this.childKey, this.childValue), nth(1))),
+      toPairs
+    );
+  }
+
+  get values() {
+    return this.filter(this._values);
   }
 }
 

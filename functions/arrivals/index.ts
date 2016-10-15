@@ -1,44 +1,27 @@
 import * as apex from 'apex.js';
-import {StreamTransform, Transformed} from "../../lib/StreamTransform";
+import {StreamTransform} from "../../lib/StreamTransform";
 import {ArrivalsCreateCommand, ArrivalsCreatePayload} from 'sparks-schemas/types/commands/ArrivalsCreate';
-import {ArrivalsRemoveCommand, ArrivalsRemovePayload} from 'sparks-schemas/types/commands/ArrivalsRemove';
+import {ArrivalsRemoveCommand} from 'sparks-schemas/types/commands/ArrivalsRemove';
 import {Arrival} from "sparks-schemas/types/models/arrival";
-import {connect} from "../../lib/Firebase";
+import {lookup} from "../../lib/Firebase";
 import {spread} from "../../lib/spread";
 
-const streamName = 'internal.data';
+const streamName = 'data.firebase';
 
-function action<T,U>(schema, fn:(message:T, firebase) => Promise<Transformed<U>>) {
-  const innerFn = connect('arrivals', fn) as any;
-  return StreamTransform<T,U>(schema, innerFn);
-}
-
-const create = action<ArrivalsCreateCommand, Arrival>('Arrivals.create', async function(message, firebase) {
+const create = StreamTransform<ArrivalsCreateCommand, Arrival>('Arrivals.create', async function(message) {
   const payload:ArrivalsCreatePayload = message.payload;
   const values = payload.values;
   const key = [values.projectKey, values.profileKey].join('-');
 
-  const alreadyArrived = await firebase
-    .database()
-    .ref()
-    .child('Arrivals')
-    .child(key)
-    .once('value')
-    .then(s => s.val());
+  const alreadyArrived = await lookup('arrivals', 'Arrivals', key);
 
   if (alreadyArrived) {
     throw new Error('Already arrived');
   }
 
-  const profileKey = await firebase
-    .database()
-    .ref()
-    .child('Users')
-    .child(message.uid)
-    .once('value')
-    .then(s => s.val());
+  const profileKey = await lookup('arrivals', 'Users', message.uid);
 
-  return {
+  return [{
     streamName,
     partitionKey: message.uid,
     data: {
@@ -53,11 +36,11 @@ const create = action<ArrivalsCreateCommand, Arrival>('Arrivals.create', async f
         projectKey: values.projectKey
       }
     }
-  };
+  }];
 });
 
 const remove = StreamTransform('Arrivals.remove', async function (message:ArrivalsRemoveCommand) {
-  return {
+  return [{
     streamName,
     partitionKey: message.uid,
     data: {
@@ -65,7 +48,7 @@ const remove = StreamTransform('Arrivals.remove', async function (message:Arriva
       action: 'remove',
       key: message.payload.key
     }
-  }
+  }];
 });
 
 export default apex(spread(create, remove));

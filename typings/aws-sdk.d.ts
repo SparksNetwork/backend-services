@@ -23,7 +23,7 @@ declare namespace Kinesis {
   }
 
   interface PutRecordParams {
-    Data: Buffer;
+    Data: Buffer|string;
     PartitionKey?: string;
     StreamName?: string;
   }
@@ -31,6 +31,29 @@ declare namespace Kinesis {
   interface PutRecordResponse {
     ShardId: string;
     SequenceNumber: string;
+  }
+
+  interface PutRecordsRecord {
+    Data: Buffer|string;
+    ExplicitHashKey?: string;
+    PartitionKey: string;
+  }
+
+  interface PutRecordsParams {
+    Records: PutRecordsRecord[];
+    StreamName?: string;
+  }
+
+  interface PutRecordsResponseRecord {
+    SequenceNumber: string;
+    ShardId: string;
+    ErrorCode?: string;
+    ErrorMessage?: string;
+  }
+
+  interface PutRecordsResponse {
+    FailedRecordCount: number;
+    Records: PutRecordsResponseRecord[];
   }
 
   interface CreateStreamParams {
@@ -131,6 +154,9 @@ declare module 'aws-sdk' {
 
     putRecord(params: Kinesis.PutRecordParams,
               callback?: Callback<Kinesis.PutRecordResponse>): Response<Kinesis.PutRecordResponse>;
+
+    putRecords(params: Kinesis.PutRecordsParams,
+              callback?: Callback<Kinesis.PutRecordsResponse>): Response<Kinesis.PutRecordsResponse>;
 
     createStream(params: Kinesis.CreateStreamParams,
                  callback?: Callback<Kinesis.CreateStreamResponse>): Response<Kinesis.CreateStreamResponse>;

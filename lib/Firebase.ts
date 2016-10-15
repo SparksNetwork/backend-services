@@ -27,3 +27,33 @@ export function connect(name:string, fn):Function {
     return fn(...args, establishConnection(name));
   }
 }
+
+export function ref(root, ...path:string[]) {
+  return path.reduce((parent, key) => {
+    return parent.child(key);
+  }, root);
+}
+
+export function search(app, [key, value]:[string, any], ...path:string[]):Promise<any> {
+  const root = (typeof app === 'string' ? establishConnection(app) : app)
+    .database()
+    .ref();
+
+  return ref(root, ...path)
+    .orderByChild(key)
+    .equalTo(value)
+    .once('value')
+    .then(s => s.val());
+}
+
+export function lookup(app, ...path:string[]):Promise<any> {
+  const root = (typeof app === 'string' ? establishConnection(app) : app)
+    .database()
+    .ref();
+
+  const childRef = ref(root, ...path);
+
+  return childRef
+    .once('value')
+    .then(s => s.val())
+}

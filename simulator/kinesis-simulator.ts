@@ -9,14 +9,15 @@ import ShardStream from "../lib/ShardStream";
 const unique = require('unique-stream');
 
 function usage() {
-  console.log('kinesis-simulator.js <stream-name> <function-name>');
+  console.log('kinesis-simulator.js <stream-name> <function-name> [...<function-name>]');
   process.exit(1);
 }
 
-const [streamName, functionName] = process.argv.slice(2);
+const streamName = process.argv[1]
+const functionNames = process.argv.slice(3);
 
 if (!streamName) { usage(); }
-if (!functionName) { usage(); }
+if (functionNames.length < 1) { usage(); }
 
 const agent = new https.Agent({
   rejectUnauthorized: false
@@ -39,13 +40,15 @@ async function start() {
     return new ShardStream(kinesis, shard.ShardId);
   });
 
-  const fn = require(`../functions/${functionName}/index.js`).default;
+  const fns = functionNames.map(functionName => {
+    return require(`../functions/${functionName}/index.js`).default;
+  });
 
   const stream = unique('SequenceNumber');
   streams.forEach(s => s.pipe(stream));
 
   stream.on('data', data => {
-    fn(data);
+    fns.forEach(fn => fn(data));
   });
   stream.on('error', err => {
     console.log('error', err)

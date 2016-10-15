@@ -68,7 +68,7 @@ dbtest('invalid create message', async function(t, db) {
   const m = mock(db.database().ref().child('Arrivals'));
   m.expects('push').never();
 
-  t.throws(KinesisFunction(invalidCreateMessage, service), 'Invalid message');
+  await KinesisFunction(invalidCreateMessage, service);
 
   m.verify();
 });
@@ -93,7 +93,7 @@ dbtest('invalid update message', async function(t, db) {
     .child('Commitments'));
   m.expects('child').never();
 
-  t.throws(KinesisFunction(invalidUpdateMessage, service), 'Invalid message');
+  await KinesisFunction(invalidUpdateMessage, service);
 
   m.verify();
 });
@@ -118,7 +118,7 @@ dbtest('invalid remove message', async function(t, db) {
 
   m.expects('child').never();
 
-  t.throws(KinesisFunction(invalidRemoveMessage, service), 'Invalid message');
+  await KinesisFunction(invalidRemoveMessage, service);
 
   m.verify();
 });

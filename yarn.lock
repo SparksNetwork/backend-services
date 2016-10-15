@@ -2898,7 +2898,7 @@ sort-keys@^1.0.0, sort-keys@^1.1.1:
   dependencies:
     is-plain-obj "^1.0.0"
 
-source-map-support, source-map-support@^0.4.0, source-map-support@^0.4.2:
+source-map-support@^0.4.0, source-map-support@^0.4.2, source-map-support@^0.4.3:
   version "0.4.3"
   resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.4.3.tgz#693c8383d4389a4569486987c219744dfc601685"
   dependencies:
@@ -2909,8 +2909,8 @@ source-map@^0.5.0, source-map@^0.5.3:
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.6.tgz#75ce38f52bf0733c5a7f0c118d81334a2bb5f412"
 
 "sparks-schemas@github:sparksnetwork/schemas":
-  version "0.0.11"
-  resolved "https://codeload.github.com/sparksnetwork/schemas/tar.gz/4e42d698f7bab9682c7276d763bc9e95fd9a0810"
+  version "0.0.13"
+  resolved "https://codeload.github.com/sparksnetwork/schemas/tar.gz/35fafa1af16ed3cbd7589149c09826997f6d1489"
   dependencies:
     ajv "^4.7.7"
 

@@ -16,6 +16,7 @@
     "typings": "^1.4.0"
   },
   "dependencies": {
+    "ajv": "^4.7.7",
     "apex.js": "^2.0.0",
     "aws-sdk": "^2.6.6",
     "firebase": "^3.4.1",

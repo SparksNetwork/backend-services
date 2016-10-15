@@ -28,18 +28,18 @@ export function connect(name:string, fn):Function {
   }
 }
 
-export function ref(root, ...path:string[]) {
+export function ref(app, ...path:string[]) {
+  const root = (typeof app === 'string' ? establishConnection(app) : app)
+    .database()
+    .ref();
+
   return path.reduce((parent, key) => {
     return parent.child(key);
   }, root);
 }
 
 export function search(app, [key, value]:[string, any], ...path:string[]):Promise<any> {
-  const root = (typeof app === 'string' ? establishConnection(app) : app)
-    .database()
-    .ref();
-
-  return ref(root, ...path)
+  return ref(app, ...path)
     .orderByChild(key)
     .equalTo(value)
     .once('value')
@@ -47,13 +47,7 @@ export function search(app, [key, value]:[string, any], ...path:string[]):Promis
 }
 
 export function lookup(app, ...path:string[]):Promise<any> {
-  const root = (typeof app === 'string' ? establishConnection(app) : app)
-    .database()
-    .ref();
-
-  const childRef = ref(root, ...path);
-
-  return childRef
+  return ref(app, ...path)
     .once('value')
     .then(s => s.val())
 }

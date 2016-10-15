@@ -1,16 +1,30 @@
 import * as apex from 'apex.js'
 import Record = Kinesis.Record;
-import Actions from "./actions";
-import {establishConnection} from "../../lib/Firebase";
+import {spread} from "../../lib/spread";
+import * as Ajv from 'ajv';
+import {CreateData, UpdateData, RemoveData} from 'sparks-schemas/types/data'
+import {ref} from '../../lib/Firebase';
+import {KinesisFunction} from "../../lib/KinesisFunction";
 
-export default apex(async function(e:Record) {
-  const message = JSON.parse(e.Data as any);
-  const actions = Actions(establishConnection('firebase-service'));
-  const action = actions[message.action];
+const firebaseUid = 'firebase-service';
+const ajv = Ajv();
+ajv.addSchema(require('sparks-schemas/schemas/data/create.json'), 'create');
+ajv.addSchema(require('sparks-schemas/schemas/data/update.json'), 'update');
+ajv.addSchema(require('sparks-schemas/schemas/data/remove.json'), 'remove');
 
-  if (action) {
-    await action(message);
-  } else {
-    return true;
-  }
+export const create = KinesisFunction(ajv.getSchema('create'), async function create(message:CreateData<any>) {
+  const childRef = ref(firebaseUid, message.domain, message.key);
+  return await childRef.set(message.values);
 });
+
+export const update = KinesisFunction(ajv.getSchema('update'), async function update(message: UpdateData<any>) {
+  const childRef = ref(firebaseUid, message.domain, message.key);
+  return await childRef.update(message.values);
+});
+
+export const remove = KinesisFunction(ajv.getSchema('remove'), async function remove(message: RemoveData) {
+  const childRef = ref(firebaseUid, message.domain, message.key);
+  return await childRef.remove();
+});
+
+export default apex(spread(create, update, remove));

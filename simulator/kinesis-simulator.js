@@ -7,6 +7,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments)).next());
     });
 };
+/**
+ * Script to run a function locally.
+ */
+require('source-map-support').install();
 const aws = require('aws-sdk');
 const https = require('https');
 const ShardStream_1 = require("../lib/ShardStream");
@@ -15,7 +19,7 @@ function usage() {
     console.log('kinesis-simulator.js <stream-name> <function-name> [...<function-name>]');
     process.exit(1);
 }
-const streamName = process.argv[1];
+const streamName = process.argv[2];
 const functionNames = process.argv.slice(3);
 if (!streamName) {
     usage();
@@ -31,18 +35,41 @@ const kinesis = new aws.Kinesis({
     httpOptions: { agent },
     params: { StreamName: streamName }
 });
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(() => resolve(), ms));
+}
+function waitForReady() {
+    return __awaiter(this, void 0, void 0, function* () {
+        let stream;
+        let state = 'CREATING';
+        while (state === 'CREATING') {
+            yield sleep(500);
+            stream = yield kinesis.describeStream({}).promise();
+            state = stream.StreamDescription.StreamStatus;
+        }
+        return stream;
+    });
+}
 function getShards() {
     return __awaiter(this, void 0, void 0, function* () {
-        const stream = yield kinesis.describeStream({}).promise();
-        return stream.StreamDescription.Shards;
+        try {
+            const stream = yield waitForReady();
+            return stream.StreamDescription.Shards;
+        }
+        catch (err) {
+            yield kinesis.createStream({
+                ShardCount: 1
+            }).promise();
+            return yield getShards();
+        }
     });
 }
 function start() {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log('starting');
         const shards = yield getShards();
+        console.log(`${shards.length} shards`);
         const streams = shards.map(shard => {
-            return new ShardStream_1.default(kinesis, shard.ShardId);
+            return new ShardStream_1.default(kinesis, shard.ShardId, "TRIM_HORIZON");
         });
         const fns = functionNames.map(functionName => {
             return require(`../functions/${functionName}/index.js`).default;
@@ -50,7 +77,11 @@ function start() {
         const stream = unique('SequenceNumber');
         streams.forEach(s => s.pipe(stream));
         stream.on('data', data => {
-            fns.forEach(fn => fn(data));
+            fns.forEach(fn => {
+                fn(data, {}, function (err, data) {
+                    console.log(err, data);
+                });
+            });
         });
         stream.on('error', err => {
             console.log('error', err);

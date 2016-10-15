@@ -1,6 +1,8 @@
 /**
  * Script to run a function locally.
  */
+require('source-map-support').install();
+
 import Shard = Kinesis.Shard;
 import * as aws from 'aws-sdk';
 import ShardRecord = Kinesis.Record;
@@ -13,7 +15,7 @@ function usage() {
   process.exit(1);
 }
 
-const streamName = process.argv[1]
+const streamName = process.argv[2];
 const functionNames = process.argv.slice(3);
 
 if (!streamName) { usage(); }
@@ -28,16 +30,42 @@ const kinesis = new aws.Kinesis({
   params: {StreamName: streamName}
 });
 
+function sleep(ms:number):Promise<any> {
+  return new Promise(resolve => setTimeout(() => resolve(), ms));
+}
+
+async function waitForReady() {
+  let stream;
+  let state = 'CREATING';
+
+  while (state === 'CREATING') {
+    await sleep(500);
+    stream = await kinesis.describeStream({}).promise();
+    state = stream.StreamDescription.StreamStatus;
+  }
+
+  return stream;
+}
+
 async function getShards() {
-  const stream = await kinesis.describeStream({}).promise();
-  return stream.StreamDescription.Shards
+  try {
+    const stream = await waitForReady();
+    return stream.StreamDescription.Shards
+  } catch (err) {
+    await kinesis.createStream({
+      ShardCount: 1
+    }).promise();
+
+    return await getShards();
+  }
 }
 
 async function start() {
-  console.log('starting');
   const shards = await getShards();
+  console.log(`${shards.length} shards`);
+
   const streams = shards.map(shard => {
-    return new ShardStream(kinesis, shard.ShardId);
+    return new ShardStream(kinesis, shard.ShardId, "TRIM_HORIZON");
   });
 
   const fns = functionNames.map(functionName => {
@@ -48,7 +76,11 @@ async function start() {
   streams.forEach(s => s.pipe(stream));
 
   stream.on('data', data => {
-    fns.forEach(fn => fn(data));
+    fns.forEach(fn => {
+      fn(data, {}, function(err, data) {
+        console.log(err, data);
+      });
+    });
   });
   stream.on('error', err => {
     console.log('error', err)

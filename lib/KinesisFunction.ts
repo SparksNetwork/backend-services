@@ -30,7 +30,9 @@ export function KinesisFunction<T>(schema:SchemaFunction = null, fn:(message:T) 
 
   return async function(e:Record) {
     const message = JSON.parse(e.Data as any) as T;
-    if(!schemaFn(message)) { return; }
-    return await fn(message);
+
+    if(schemaFn(message)) {
+      return await fn(message);
+    }
   };
 }

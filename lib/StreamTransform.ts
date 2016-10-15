@@ -1,3 +1,4 @@
+import * as https from 'https';
 import {Kinesis} from 'aws-sdk';
 import {KinesisFunction} from "./KinesisFunction";
 import {groupBy, prop, toPairs, compose} from 'ramda'
@@ -35,7 +36,14 @@ function byStream<T>(records:StreamRecord<T>[]):[string, StreamRecord<T>[]][] {
 export function StreamTransform<T,U>(schema:string|Function, transform:Transform<T,U>) {
   return KinesisFunction<T>(schema, async function(message:T) {
     const records:StreamRecord<U>[] = await transform(message);
-    const kinesis = new Kinesis();
+
+    const agent = new https.Agent({
+      rejectUnauthorized: false
+    } as any);
+    const kinesis = new Kinesis({
+      endpoint: process.env['KINESIS_ENDPOINT'],
+      httpOptions: {agent}
+    });
 
     return await Promise.all(
       byStream(records).map(([streamName, records]) => {

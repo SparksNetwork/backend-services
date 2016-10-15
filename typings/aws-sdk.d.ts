@@ -57,7 +57,7 @@ declare namespace Kinesis {
   }
 
   interface CreateStreamParams {
-    StreamName: string;
+    StreamName?: string;
     ShardCount: number;
   }
 

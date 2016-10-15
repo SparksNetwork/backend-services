@@ -1,4 +1,4 @@
-import KinesisFunction from "./KinesisFunction";
+import {StreamFunction} from "./StreamFunction";
 import {SinonStub} from "sinon";
 import {StreamRecord} from "../lib/StreamTransform";
 import {flatten} from 'ramda'
@@ -7,7 +7,7 @@ const AWS = require('aws-sdk-mock');
 export async function StreamTransform(message, service, params?:{PartitionKey:string, StreamName:string}):Promise<StreamRecord<any>[]> {
   try {
     const putRecords = AWS.mock('Kinesis', 'putRecords');
-    await KinesisFunction(message, service);
+    await StreamFunction(message, service);
     const stub:SinonStub = putRecords.stub;
     if (!stub) {
       throw new Error('Sent no messages');

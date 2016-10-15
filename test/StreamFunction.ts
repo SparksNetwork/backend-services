@@ -6,6 +6,6 @@ function makeRecord(message) {
   }
 }
 
-export default async function KinesisFunction(message:Object, service:Function) {
+export async function StreamFunction(message:Object, service:Function) {
   return await apex(service, makeRecord(message));
 }

@@ -1,6 +1,6 @@
 import * as https from 'https';
 import {Kinesis} from 'aws-sdk';
-import {KinesisFunction} from "./KinesisFunction";
+import {StreamFunction} from "./StreamFunction";
 import {groupBy, prop, toPairs, compose} from 'ramda'
 
 export interface StreamRecord<U> {
@@ -33,8 +33,8 @@ function byStream<T>(records:StreamRecord<T>[]):[string, StreamRecord<T>[]][] {
  * @returns {(e:Record)=>Promise<any>}
  * @constructor
  */
-export function StreamTransform<T,U>(schema:string|Function, transform:Transform<T,U>) {
-  return KinesisFunction<T>(schema, async function(message:T) {
+export function StreamTransform<T,U>(schema, transform:Transform<T,U>) {
+  return StreamFunction<T>(schema, async function(message:T) {
     const records:StreamRecord<U>[] = await transform(message);
 
     const agent = new https.Agent({

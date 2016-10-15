@@ -3,7 +3,7 @@ import service from './index';
 import {test, ContextualTestContext} from "ava";
 import {MockFirebase} from "../../test/MockFirebase";
 import {establishConnection} from "../../lib/Firebase";
-import KinesisFunction from "../../test/KinesisFunction";
+import {StreamFunction} from "../../test/StreamFunction";
 
 const createMessage = {
   domain: "Arrivals",
@@ -45,35 +45,30 @@ const invalidRemoveMessage = {
   action: 'remove'
 };
 
-function dbtest(m:string, tfn:(t:ContextualTestContext, db:MockFirebase) => Promise<any>) {
-  return test(m, async function(t) {
-    const db = new MockFirebase();
-    establishConnection('firebase-service', db);
-    return await tfn(t, db);
-  });
-}
+const db = new MockFirebase();
+establishConnection('firebase-service', db);
 
-dbtest('create message', async function(t, db) {
+test.serial('create message', async function(t) {
   const m = mock(db.database().ref().child('Arrivals').child('abc123'));
   m.expects('set')
     .withArgs(createMessage.values)
     .returns(Promise.resolve({}));
 
-  await KinesisFunction(createMessage, service);
+  await StreamFunction(createMessage, service);
 
   m.verify();
 });
 
-dbtest('invalid create message', async function(t, db) {
+test('invalid create message', async function(t) {
   const m = mock(db.database().ref().child('Arrivals'));
   m.expects('push').never();
 
-  await KinesisFunction(invalidCreateMessage, service);
+  await StreamFunction(invalidCreateMessage, service);
 
   m.verify();
 });
 
-dbtest('update message', async function(t, db) {
+test.serial('update message', async function(t) {
   const m = mock(db.database().ref()
     .child('Commitments')
     .child('cde234'));
@@ -83,22 +78,22 @@ dbtest('update message', async function(t, db) {
     .withArgs(updateMessage.values)
     .returns(Promise.resolve({}));
 
-  await KinesisFunction(updateMessage, service);
+  await StreamFunction(updateMessage, service);
 
   m.verify();
 });
 
-dbtest('invalid update message', async function(t, db) {
+test.serial('invalid update message', async function(t) {
   const m = mock(db.database().ref()
     .child('Commitments'));
   m.expects('child').never();
 
-  await KinesisFunction(invalidUpdateMessage, service);
+  await StreamFunction(invalidUpdateMessage, service);
 
   m.verify();
 });
 
-dbtest('remove message', async function(t, db) {
+test.serial('remove message', async function(t) {
   const m = mock(db.database().ref()
     .child('Engagements')
     .child('cde234'));
@@ -107,18 +102,18 @@ dbtest('remove message', async function(t, db) {
     .once()
     .returns(Promise.resolve({}));
 
-  await KinesisFunction(removeMessage, service);
+  await StreamFunction(removeMessage, service);
 
   m.verify();
 });
 
-dbtest('invalid remove message', async function(t, db) {
+test.serial('invalid remove message', async function(t) {
   const m = mock(db.database().ref()
     .child('Engagements'));
 
   m.expects('child').never();
 
-  await KinesisFunction(invalidRemoveMessage, service);
+  await StreamFunction(invalidRemoveMessage, service);
 
   m.verify();
 });

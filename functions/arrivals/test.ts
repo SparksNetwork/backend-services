@@ -28,10 +28,7 @@ test.serial('create', async function(t) {
     }
   };
 
-  const [{data}] = await StreamTransform(message, service, {
-    PartitionKey: 'abc123',
-    StreamName: 'internal.data'
-  });
+  const [{data}] = await StreamTransform(message, service);
 
   t.is(data.domain, 'Arrivals');
   t.is(data.action, 'create');

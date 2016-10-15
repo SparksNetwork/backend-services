@@ -1,6 +1,6 @@
 import {mock} from 'sinon'
 import service from './index';
-import {test, ContextualTestContext} from "ava";
+import {test} from "ava";
 import {MockFirebase} from "../../test/MockFirebase";
 import {establishConnection} from "../../lib/Firebase";
 import {StreamFunction} from "../../test/StreamFunction";

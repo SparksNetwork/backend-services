@@ -115,6 +115,10 @@ export class MockDatabase {
   }
 }
 
+/**
+ * A mock firebase. This implements some but not all of the firebase API
+ * in memory for testing purposes.
+ */
 export class MockFirebase {
   private _database:MockDatabase;
 

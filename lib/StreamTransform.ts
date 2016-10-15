@@ -11,6 +11,13 @@ export interface StreamRecord<U> {
 
 export type Transform<T,U> = (message:T) => Promise<Array<StreamRecord<U>>>;
 
+/**
+ * Take an array of StreamRecords that might be destined for different streams
+ * and group by the target stream name.
+ *
+ * @param records
+ * @returns {any}
+ */
 function byStream<T>(records:StreamRecord<T>[]):[string, StreamRecord<T>[]][] {
   return compose<StreamRecord<T>[], any, [string, StreamRecord<T>[]][]>(
     toPairs,
@@ -21,14 +28,16 @@ function byStream<T>(records:StreamRecord<T>[]):[string, StreamRecord<T>[]][] {
 
 /**
  * This indicates a function that takes a message from a kinesis stream and
- * outputs a message suitable for another kinesis stream.
+ * outputs messages suitable to send back to kinesis.
  *
  * The schema can be a function that returns a boolean or a string that will
  * be passed to the command() function to get a schema. Messages will be
  * filtered by the schema before being passed to the function.
  *
+ * The returned messages must implement the StreamRecord interface, and
+ * can be sent to one or more streams.
+ *
  * @param schema
- * @param outStream
  * @param transform
  * @returns {(e:Record)=>Promise<any>}
  * @constructor

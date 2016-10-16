@@ -25,6 +25,7 @@
     "kinesis-readable": "^1.0.0",
     "node-uuid": "^1.4.7",
     "ramda": "^0.22.1",
+    "sendgrid": "^4.7.0",
     "source-map-support": "^0.4.3",
     "sparks-schemas": "github:sparksnetwork/schemas",
     "unique-stream": "^2.2.1"

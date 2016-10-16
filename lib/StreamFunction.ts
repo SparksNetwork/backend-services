@@ -3,6 +3,20 @@ import Record = Kinesis.Record;
 import ValidateFunction = ajv.ValidateFunction;
 
 type SchemaFunction = (message:any) => boolean | Promise<boolean>;
+type ValidationOption = ValidateFunction | SchemaFunction | string | null;
+type ValidationArg = ValidationOption | Promise<ValidationOption>;
+
+async function createValidationFunction(fromp:ValidationArg):Promise<SchemaFunction> {
+  const from = await Promise.resolve(fromp);
+
+  if (typeof from === 'string') {
+    return command(from) as SchemaFunction;
+  } else if (!from) {
+    return () => true
+  }
+
+  return from as any;
+}
 
 /**
  * Wrap a function in a function that takes a kinesis record, deserializes it,
@@ -20,18 +34,11 @@ type SchemaFunction = (message:any) => boolean | Promise<boolean>;
  * @returns {(e:Record)=>Promise<undefined|any>}
  * @constructor
  */
-export function StreamFunction<T>(schema: ValidateFunction | SchemaFunction | string | null, fn:(message:T) => Promise<any>) {
-  let schemaFn:SchemaFunction;
-
-  if (typeof schema === 'string') {
-    schemaFn = command(schema) as SchemaFunction;
-  } else if (!schema) {
-    schemaFn = () => true
-  } else {
-    schemaFn = schema as any;
-  }
+export function StreamFunction<T>(schema: ValidationArg, fn:(message:T) => Promise<any>) {
+  const schemaPromise = createValidationFunction(schema);
 
   return async function(e:Record) {
+    const schemaFn = await schemaPromise;
     const message = JSON.parse(e.Data as any) as T;
     const valid = await Promise.resolve(schemaFn(message));
 

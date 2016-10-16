@@ -2,7 +2,7 @@ import * as apex from 'apex.js';
 import {
   CommandTransform,
   UpdateTransform, RemoveTransform
-} from "../../lib/CommandToDataTransform";
+} from "../../helpers/CommandToDataTransform";
 import {MembershipsCreateCommand} from 'sparks-schemas/types/commands/MembershipsCreate'
 import {StreamTransform} from "../../lib/StreamTransform";
 import {spread} from "../../lib/spread";

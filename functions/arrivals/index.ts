@@ -5,9 +5,13 @@ import {ArrivalsRemoveCommand} from 'sparks-schemas/types/commands/ArrivalsRemov
 import {Arrival} from "sparks-schemas/types/models/arrival";
 import {lookup} from "../../lib/Firebase";
 import {spread} from "../../lib/spread";
+import {RemoveTransform} from "../../helpers/CommandToDataTransform";
 
 const streamName = 'data.firebase';
 
+/**
+ * An arrival can only be marked as arrived once
+ */
 const create = StreamTransform<ArrivalsCreateCommand, Arrival>('Arrivals.create', async function(message) {
   const payload:ArrivalsCreatePayload = message.payload;
   const values = payload.values;
@@ -15,9 +19,8 @@ const create = StreamTransform<ArrivalsCreateCommand, Arrival>('Arrivals.create'
 
   const alreadyArrived = await lookup('arrivals', 'Arrivals', key);
 
-  if (alreadyArrived) {
-    throw new Error('Already arrived');
-  }
+  // If already arrived then exit still consuming the message.
+  if (alreadyArrived) { return [] }
 
   const profileKey = await lookup('arrivals', 'Users', message.uid);
 
@@ -39,16 +42,4 @@ const create = StreamTransform<ArrivalsCreateCommand, Arrival>('Arrivals.create'
   }];
 });
 
-const remove = StreamTransform('Arrivals.remove', async function (message:ArrivalsRemoveCommand) {
-  return [{
-    streamName,
-    partitionKey: message.uid,
-    data: {
-      domain: 'Arrivals',
-      action: 'remove',
-      key: message.payload.key
-    }
-  }];
-});
-
-export default apex(spread(create, remove));
+export default apex(spread(create, RemoveTransform('Arrivals.remove')));

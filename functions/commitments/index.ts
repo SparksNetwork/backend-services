@@ -1,4 +1,4 @@
 import * as apex from 'apex.js';
-import {CommandTransform} from "../../lib/CommandToDataTransform";
+import {CommandTransform} from "../../helpers/CommandToDataTransform";
 
 export default apex(CommandTransform('Commitments'));

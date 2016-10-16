@@ -1,12 +1,12 @@
-import {StreamTransform} from "./StreamTransform";
+import {StreamTransform} from "../lib/StreamTransform";
 import {Command} from "sparks-schemas/types/command";
-import {v4} from "node-uuid";
-import {spread} from "./spread";
+import {spread} from "../lib/spread";
+import {firebaseUid} from "../lib/Firebase";
 
 export function CreateTransform(schemaName:string) {
   return StreamTransform(schemaName, async function({domain, action, uid, payload}:Command) {
     const {values} = payload;
-    const key = v4();
+    const key = firebaseUid();
 
     return [{
       streamName: 'data.firebase',

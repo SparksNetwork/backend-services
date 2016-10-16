@@ -57,7 +57,8 @@ test.serial('create already arrived', async function(t) {
     }
   };
 
-  t.throws(StreamTransform(message, service), 'Already arrived');
+  const messages = await StreamTransform(message, service);
+  t.is(messages.length, 0, 'Already arrived produces no messages');
 });
 
 test.serial('remove', async function(t) {

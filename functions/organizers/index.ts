@@ -1,7 +1,7 @@
 import * as apex from 'apex.js';
 import {spread} from "../../lib/spread";
 import {merge} from 'ramda';
-import {RemoveTransform} from "../../lib/CommandToDataTransform";
+import {RemoveTransform} from "../../helpers/CommandToDataTransform";
 import {StreamTransform} from "../../lib/StreamTransform";
 import {OrganizersAcceptCommand} from 'sparks-schemas/types/commands/OrganizersAccept';
 import {OrganizersCreateCommand} from 'sparks-schemas/types/commands/OrganizersCreate';

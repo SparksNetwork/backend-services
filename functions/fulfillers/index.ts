@@ -1,5 +1,5 @@
 import * as apex from 'apex.js';
-import {RemoveTransform} from "../../lib/CommandToDataTransform";
+import {RemoveTransform} from "../../helpers/CommandToDataTransform";
 import {spread} from "../../lib/spread";
 import {StreamTransform} from "../../lib/StreamTransform";
 import {FulfillersCreateCommand} from 'sparks-schemas/types/commands/FulfillersCreate';

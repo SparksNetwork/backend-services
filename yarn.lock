@@ -2990,8 +2990,8 @@ source-map@^0.5.0, source-map@^0.5.3:
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.6.tgz#75ce38f52bf0733c5a7f0c118d81334a2bb5f412"
 
 "sparks-schemas@github:sparksnetwork/schemas":
-  version "0.0.20"
-  resolved "https://codeload.github.com/sparksnetwork/schemas/tar.gz/721d724041009d8f059188b821d866a5ca7c24c5"
+  version "0.0.22"
+  resolved "https://codeload.github.com/sparksnetwork/schemas/tar.gz/50de1e72d936c13a10e45117a9347fe20c5fac77"
   dependencies:
     ajv "^4.7.7"
 

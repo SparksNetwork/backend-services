@@ -10,12 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 const StreamTransform_1 = require("../lib/StreamTransform");
 const spread_1 = require("../lib/spread");
 const Firebase_1 = require("../lib/Firebase");
-function CreateTransform(schemaName) {
-    return StreamTransform_1.StreamTransform(schemaName, function ({ domain, action, uid, payload }) {
+const ramda_1 = require('ramda');
+function CreateTransform(schemaName, transform) {
+    return StreamTransform_1.StreamTransform(schemaName, function (message) {
         return __awaiter(this, void 0, void 0, function* () {
+            const { domain, action, uid, payload } = message;
             const { values } = payload;
             const key = Firebase_1.firebaseUid();
-            return [{
+            return yield (transform || ramda_1.identity)([{
                     streamName: 'data.firebase',
                     partitionKey: uid,
                     data: {
@@ -24,16 +26,17 @@ function CreateTransform(schemaName) {
                         key,
                         values
                     }
-                }];
+                }]);
         });
     });
 }
 exports.CreateTransform = CreateTransform;
-function UpdateTransform(schemaName) {
-    return StreamTransform_1.StreamTransform(schemaName, function ({ domain, action, uid, payload }) {
+function UpdateTransform(schemaName, transform) {
+    return StreamTransform_1.StreamTransform(schemaName, function (message) {
         return __awaiter(this, void 0, void 0, function* () {
+            const { domain, action, uid, payload } = message;
             const { key, values } = payload;
-            return [{
+            return yield (transform || ramda_1.identity)([{
                     streamName: 'data.firebase',
                     partitionKey: uid,
                     data: {
@@ -42,16 +45,17 @@ function UpdateTransform(schemaName) {
                         key,
                         values
                     }
-                }];
+                }]);
         });
     });
 }
 exports.UpdateTransform = UpdateTransform;
-function RemoveTransform(schemaName) {
-    return StreamTransform_1.StreamTransform(schemaName, function ({ domain, action, uid, payload }) {
+function RemoveTransform(schemaName, transform) {
+    return StreamTransform_1.StreamTransform(schemaName, function (message) {
         return __awaiter(this, void 0, void 0, function* () {
+            const { domain, action, uid, payload } = message;
             const { key } = payload;
-            return [{
+            return (transform || ramda_1.identity)([{
                     streamName: 'data.firebase',
                     partitionKey: uid,
                     data: {
@@ -59,7 +63,7 @@ function RemoveTransform(schemaName) {
                         action,
                         key
                     }
-                }];
+                }]);
         });
     });
 }

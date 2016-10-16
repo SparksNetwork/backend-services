@@ -1,12 +1,19 @@
 import {firebaseUid, lookup} from '../lib/Firebase';
 import {StreamTransform} from '../lib/StreamTransform';
-import {merge} from 'ramda'
+import {merge, identity} from 'ramda'
+import {TransformFunction} from "./CommandToDataTransform";
 
-export function CreateWithOwnerProfileKey(schemaName:string) {
-  return StreamTransform('Projects.create', async function ({domain, action, uid, payload: {values}}) {
-    const ownerProfileKey = await lookup('projects', 'Users', uid);
+/**
+ * Helper, this is a replacement for CreateTransform that adds the profile key
+ * of the current user as the ownerProfileKey.
+ */
+export function CreateWithOwnerProfileKey(schemaName:string, transform?:TransformFunction) {
+  const service = schemaName.split('.')[0].toLowerCase();
 
-    return [
+  return StreamTransform(schemaName, async function ({domain, action, uid, payload: {values}}) {
+    const ownerProfileKey = await lookup(service, 'Users', uid);
+
+    return (transform||identity)([
       {
         streamName: 'data.firebase',
         partitionKey: uid,
@@ -17,7 +24,7 @@ export function CreateWithOwnerProfileKey(schemaName:string) {
           values: merge(values, {ownerProfileKey})
         }
       }
-    ]
+    ])
   });
 }
 

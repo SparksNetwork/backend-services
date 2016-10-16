@@ -10,11 +10,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 const Firebase_1 = require('../lib/Firebase');
 const StreamTransform_1 = require('../lib/StreamTransform');
 const ramda_1 = require('ramda');
-function CreateWithOwnerProfileKey(schemaName) {
-    return StreamTransform_1.StreamTransform('Projects.create', function ({ domain, action, uid, payload: { values } }) {
+/**
+ * Helper, this is a replacement for CreateTransform that adds the profile key
+ * of the current user as the ownerProfileKey.
+ */
+function CreateWithOwnerProfileKey(schemaName, transform) {
+    const service = schemaName.split('.')[0].toLowerCase();
+    return StreamTransform_1.StreamTransform(schemaName, function ({ domain, action, uid, payload: { values } }) {
         return __awaiter(this, void 0, void 0, function* () {
-            const ownerProfileKey = yield Firebase_1.lookup('projects', 'Users', uid);
-            return [
+            const ownerProfileKey = yield Firebase_1.lookup(service, 'Users', uid);
+            return (transform || ramda_1.identity)([
                 {
                     streamName: 'data.firebase',
                     partitionKey: uid,
@@ -25,7 +30,7 @@ function CreateWithOwnerProfileKey(schemaName) {
                         values: ramda_1.merge(values, { ownerProfileKey })
                     }
                 }
-            ];
+            ]);
         });
     });
 }

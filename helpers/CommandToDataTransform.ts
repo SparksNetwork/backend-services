@@ -2,13 +2,17 @@ import {StreamTransform} from "../lib/StreamTransform";
 import {Command} from "sparks-schemas/types/command";
 import {spread} from "../lib/spread";
 import {firebaseUid} from "../lib/Firebase";
+import {identity} from 'ramda';
 
-export function CreateTransform(schemaName:string) {
-  return StreamTransform(schemaName, async function({domain, action, uid, payload}:Command) {
+export type TransformFunction = (messages:any[]) => any[] | Promise<any[]>
+
+export function CreateTransform(schemaName:string, transform?:TransformFunction) {
+  return StreamTransform(schemaName, async function(message:Command) {
+    const {domain, action, uid, payload} = message;
     const {values} = payload;
     const key = firebaseUid();
 
-    return [{
+    return await (transform||identity)([{
       streamName: 'data.firebase',
       partitionKey: uid,
       data: {
@@ -17,15 +21,16 @@ export function CreateTransform(schemaName:string) {
         key,
         values
       }
-    }];
+    }]);
   });
 }
 
-export function UpdateTransform(schemaName:string) {
-  return StreamTransform(schemaName, async function({domain, action, uid, payload}:Command) {
+export function UpdateTransform(schemaName:string, transform?:TransformFunction) {
+  return StreamTransform(schemaName, async function(message:Command) {
+    const {domain, action, uid, payload} = message;
     const {key, values} = payload;
 
-    return [{
+    return await (transform||identity)([{
       streamName: 'data.firebase',
       partitionKey: uid,
       data: {
@@ -34,15 +39,16 @@ export function UpdateTransform(schemaName:string) {
         key,
         values
       }
-    }]
+    }])
   });
 }
 
-export function RemoveTransform(schemaName:string) {
-  return StreamTransform(schemaName, async function({domain, action, uid, payload}:Command) {
+export function RemoveTransform(schemaName:string, transform?:TransformFunction) {
+  return StreamTransform(schemaName, async function(message:Command) {
+    const {domain, action, uid, payload} = message;
     const {key} = payload;
 
-    return [{
+    return (transform||identity)([{
       streamName: 'data.firebase',
       partitionKey: uid,
       data: {
@@ -50,7 +56,7 @@ export function RemoveTransform(schemaName:string) {
         action,
         key
       }
-    }];
+    }]);
   });
 }
 

@@ -3,7 +3,7 @@ import Record = Kinesis.Record;
 import {spread} from "../../lib/spread";
 import * as Ajv from 'ajv';
 import {CreateData, UpdateData, RemoveData} from 'sparks-schemas/types/data'
-import {ref} from '../../lib/Firebase';
+import {ref} from '../../lib/ExternalFactories/Firebase';
 import {StreamFunction} from "../../lib/StreamFunction";
 
 const firebaseUid = 'firebase-service';

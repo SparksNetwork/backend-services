@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 const StreamTransform_1 = require("../lib/StreamTransform");
 const spread_1 = require("../lib/spread");
-const Firebase_1 = require("../lib/Firebase");
+const Firebase_1 = require("../lib/ExternalFactories/Firebase");
 const ramda_1 = require('ramda');
 function CreateTransform(schemaName, transform) {
     return StreamTransform_1.StreamTransform(schemaName, function (message) {

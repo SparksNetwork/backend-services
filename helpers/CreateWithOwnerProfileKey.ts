@@ -1,4 +1,4 @@
-import {firebaseUid, lookup} from '../lib/Firebase';
+import {firebaseUid, lookup} from '../lib/ExternalFactories/Firebase';
 import {StreamTransform} from '../lib/StreamTransform';
 import {merge, identity} from 'ramda'
 import {TransformFunction} from "./CommandToDataTransform";

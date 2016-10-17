@@ -4,7 +4,7 @@ import {ProfilesUpdateCommand, ProfilesUpdatePayload} from 'sparks-schemas/types
 import {test} from "ava";
 import {StreamTransform} from "../../test/StreamTransform";
 import {MockFirebase} from "../../test/MockFirebase";
-import {establishConnection} from "../../lib/Firebase";
+import {establishConnection} from "../../lib/ExternalFactories/Firebase";
 
 const db = new MockFirebase();
 establishConnection('profiles', db);

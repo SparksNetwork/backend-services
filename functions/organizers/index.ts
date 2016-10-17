@@ -7,7 +7,7 @@ import {OrganizersAcceptCommand} from 'sparks-schemas/types/commands/OrganizersA
 import {OrganizersCreateCommand} from 'sparks-schemas/types/commands/OrganizersCreate';
 import {OrganizerInviteEmail} from 'sparks-schemas/types/emails/organizerInvite';
 import {CreateData} from 'sparks-schemas/types/data';
-import {lookup, firebaseUid} from '../../lib/Firebase';
+import {lookup, firebaseUid} from '../../lib/ExternalFactories/Firebase';
 import {Organizer} from "sparks-schemas/types/models/organizer";
 
 const DOMAIN = process.env['DOMAIN'];

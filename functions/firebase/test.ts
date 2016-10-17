@@ -2,7 +2,7 @@ import {mock} from 'sinon'
 import service from './index';
 import {test} from "ava";
 import {MockFirebase} from "../../test/MockFirebase";
-import {establishConnection} from "../../lib/Firebase";
+import {establishConnection} from "../../lib/ExternalFactories/Firebase";
 import {StreamFunction} from "../../test/StreamFunction";
 
 const createMessage = {

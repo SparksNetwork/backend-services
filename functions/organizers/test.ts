@@ -8,7 +8,7 @@ import {OrganizersCreateCommand} from 'sparks-schemas/types/commands/OrganizersC
 import {OrganizersRemoveCommand} from 'sparks-schemas/types/commands/OrganizersRemove';
 import {StreamTransform} from "../../test/StreamTransform";
 import {MockDatabase, MockFirebase} from "../../test/MockFirebase";
-import {establishConnection} from "../../lib/Firebase";
+import {establishConnection} from "../../lib/ExternalFactories/Firebase";
 
 const acceptCommand:OrganizersAcceptCommand = {
   domain: 'Organizers',

@@ -2,8 +2,8 @@ import * as apex from 'apex.js';
 import {EngagementsCreateCommand} from 'sparks-schemas/types/commands/EngagementsCreate';
 import {StreamTransform} from "../../lib/StreamTransform";
 import {spread} from "../../lib/spread";
-import {lookup} from "../../lib/Firebase";
-import {BraintreeGateway} from "../../ExternalFactories/Braintree";
+import {lookup} from "../../lib/ExternalFactories/Firebase";
+import {BraintreeGateway} from "../../lib/ExternalFactories/Braintree";
 
 const generatePaymentToken = StreamTransform('Engagements.create', async function({domain, uid, payload: {values}}:EngagementsCreateCommand) {
 

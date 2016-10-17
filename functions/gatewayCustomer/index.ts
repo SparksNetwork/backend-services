@@ -7,8 +7,8 @@ import {Profile} from "sparks-schemas/types/models/profile";
 import {data} from 'sparks-schemas/generator';
 import {applySpec, prop, propOr, compose, head, last, split, fromPairs, toPairs, filter} from 'ramda';
 import {Braintree} from "../../typings/braintree";
-import {BraintreeGateway} from "../../ExternalFactories/Braintree";
-import {lookup} from "../../lib/Firebase";
+import {BraintreeGateway} from "../../lib/ExternalFactories/Braintree";
+import {lookup} from "../../lib/ExternalFactories/Firebase";
 
 const makeCustomerOptions:(profile:Profile) => Braintree.CustomerOptions = applySpec({
   email: propOr('unknown@example.com', 'email'),

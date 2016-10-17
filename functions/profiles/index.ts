@@ -3,7 +3,7 @@ import {StreamTransform} from "../../lib/StreamTransform";
 import {ProfilesCreateCommand, ProfilesCreatePayload} from 'sparks-schemas/types/commands/ProfilesCreate';
 import {ProfilesUpdateCommand} from 'sparks-schemas/types/commands/ProfilesUpdate';
 import {Profile} from 'sparks-schemas/types/models/profile';
-import {lookup, search} from "../../lib/Firebase";
+import {lookup, search} from "../../lib/ExternalFactories/Firebase";
 import {spread} from "../../lib/spread";
 import {merge} from 'ramda'
 

@@ -6,7 +6,7 @@ import {
   RemoveTransform
 } from "../../helpers/CommandToDataTransform";
 import {lensPath, set, view} from 'ramda';
-import {lookup} from "../../lib/Firebase";
+import {lookup} from "../../lib/ExternalFactories/Firebase";
 
 const partitionKey = lensPath(['partitionKey']);
 const projectKeyPath = lensPath(['data', 'values', 'projectKey']);

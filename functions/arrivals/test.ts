@@ -4,7 +4,7 @@ import {test} from 'ava';
 import {ArrivalsCreateCommand} from 'sparks-schemas/types/commands/ArrivalsCreate';
 import {ArrivalsRemoveCommand} from 'sparks-schemas/types/commands/ArrivalsRemove';
 import {MockFirebase} from "../../test/MockFirebase";
-import {establishConnection} from "../../lib/Firebase";
+import {establishConnection} from "../../lib/ExternalFactories/Firebase";
 import {StreamTransform} from "../../test/StreamTransform";
 
 const db = new MockFirebase();

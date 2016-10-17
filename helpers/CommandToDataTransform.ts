@@ -1,7 +1,7 @@
 import {StreamTransform} from "../lib/StreamTransform";
 import {Command} from "sparks-schemas/types/command";
 import {spread} from "../lib/spread";
-import {firebaseUid} from "../lib/Firebase";
+import {firebaseUid} from "../lib/ExternalFactories/Firebase";
 import {identity} from 'ramda';
 
 export type TransformFunction = (messages:any[]) => any[] | Promise<any[]>

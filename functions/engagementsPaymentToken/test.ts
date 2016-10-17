@@ -2,10 +2,10 @@ import {mock} from 'sinon';
 import service from './index';
 import {test} from 'ava';
 import {EngagementsCreateCommand} from 'sparks-schemas/types/commands/EngagementsCreate';
-import {BraintreeGateway} from "../../ExternalFactories/Braintree";
+import {BraintreeGateway} from "../../lib/ExternalFactories/Braintree";
 import {StreamTransform} from "../../test/StreamTransform";
 import {MockFirebase} from "../../test/MockFirebase";
-import {establishConnection} from "../../lib/Firebase";
+import {establishConnection} from "../../lib/ExternalFactories/Firebase";
 
 const braintree = {
   clientToken: {

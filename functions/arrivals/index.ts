@@ -3,7 +3,7 @@ import {StreamTransform} from "../../lib/StreamTransform";
 import {ArrivalsCreateCommand, ArrivalsCreatePayload} from 'sparks-schemas/types/commands/ArrivalsCreate';
 import {ArrivalsRemoveCommand} from 'sparks-schemas/types/commands/ArrivalsRemove';
 import {Arrival} from "sparks-schemas/types/models/arrival";
-import {lookup} from "../../lib/Firebase";
+import {lookup} from "../../lib/ExternalFactories/Firebase";
 import {spread} from "../../lib/spread";
 import {RemoveTransform} from "../../helpers/CommandToDataTransform";
 

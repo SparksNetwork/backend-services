@@ -4,7 +4,8 @@ import {EngagementsCreateCommand} from 'sparks-schemas/types/commands/Engagement
 import {StreamTransform} from "../../lib/StreamTransform";
 import {UpdateTransform} from "../../helpers/CommandToDataTransform";
 
-const create = StreamTransform('Engagements.create', async function({domain, uid, payload: {values}}:EngagementsCreateCommand) {
+const create = StreamTransform('Engagements.create', async function(
+  {domain, uid, payload: {values}}:EngagementsCreateCommand) {
 
   const key = [values.oppKey, values.profileKey].join('-');
   const {oppKey, profileKey} = values;

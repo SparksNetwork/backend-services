@@ -3,9 +3,9 @@ import service from './index';
 import {test} from 'ava';
 import {StreamTransform} from "../../test/StreamTransform";
 import {StreamFunction} from "../../test/StreamFunction";
-import {BraintreeGateway} from "../../ExternalFactories/Braintree";
+import {BraintreeGateway} from "../../lib/ExternalFactories/Braintree";
 import {MockFirebase} from "../../test/MockFirebase";
-import {establishConnection} from "../../lib/Firebase";
+import {establishConnection} from "../../lib/ExternalFactories/Firebase";
 
 const braintree = {
   customer: {

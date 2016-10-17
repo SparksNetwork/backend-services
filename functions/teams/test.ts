@@ -7,7 +7,7 @@ import {TeamsUpdateCommand} from 'sparks-schemas/types/commands/TeamsUpdate'
 import {TeamsRemoveCommand} from 'sparks-schemas/types/commands/TeamsRemove'
 import {StreamTransform} from "../../test/StreamTransform";
 import {MockFirebase} from "../../test/MockFirebase";
-import {establishConnection} from "../../lib/Firebase";
+import {establishConnection} from "../../lib/ExternalFactories/Firebase";
 
 const createCommand:TeamsCreateCommand = {
   domain: 'Teams',

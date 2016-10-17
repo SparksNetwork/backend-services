@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments)).next());
     });
 };
-const Firebase_1 = require('../lib/Firebase');
+const Firebase_1 = require('../lib/ExternalFactories/Firebase');
 const StreamTransform_1 = require('../lib/StreamTransform');
 const ramda_1 = require('ramda');
 /**

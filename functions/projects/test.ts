@@ -5,7 +5,7 @@ import {ProjectsUpdateCommand} from 'sparks-schemas/types/commands/ProjectsUpdat
 import {ProjectsRemoveCommand} from 'sparks-schemas/types/commands/ProjectsRemove';
 import {StreamTransform} from "../../test/StreamTransform";
 import {MockFirebase} from "../../test/MockFirebase";
-import {establishConnection} from "../../lib/Firebase";
+import {establishConnection} from "../../lib/ExternalFactories/Firebase";
 
 const createMessage:ProjectsCreateCommand = {
   domain: 'Projects',

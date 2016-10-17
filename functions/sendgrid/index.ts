@@ -2,7 +2,7 @@ import * as apex from 'apex.js';
 import {StreamFunction} from "../../lib/StreamFunction";
 import {email} from "sparks-schemas/generator";
 import {TransactionEmail} from 'sparks-schemas/types/transactionEmail'
-import {sendgrid} from "../../lib/Sendgrid";
+import {sendgrid} from "../../ExternalFactories/Sendgrid";
 import {assoc} from 'ramda'
 
 function convertSubstitutions(subs) {

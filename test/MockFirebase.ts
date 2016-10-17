@@ -123,6 +123,10 @@ export class MockFirebase {
   private _database:MockDatabase;
 
   constructor() {
+    this.reset();
+  }
+
+  reset() {
     this._database = new MockDatabase();
   }
 

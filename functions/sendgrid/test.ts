@@ -3,7 +3,7 @@ import {test} from 'ava';
 import {AcceptedEmail} from 'sparks-schemas/types/emails/accepted';
 import {StreamFunction} from "../../test/StreamFunction";
 import {mock} from 'sinon';
-import {sendgrid} from "../../lib/Sendgrid";
+import {sendgrid} from "../../ExternalFactories/Sendgrid";
 
 const Sendgrid = {
   emptyRequest() {},

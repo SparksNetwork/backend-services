@@ -1,4 +1,4 @@
-import * as Sendgrid from 'sendgrid';
+import * as Sendgrid from 'Sendgrid';
 
 let staticSendgrid = Sendgrid(process.env['SENDGRID_API_KEY']);
 

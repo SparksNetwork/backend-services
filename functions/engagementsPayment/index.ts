@@ -1,21 +1,9 @@
 import * as apex from 'apex.js';
-import {StreamTransform} from "../../lib/StreamTransform";
+import {pay} from "./pay";
+import {spread} from "../../lib/spread";
+import {confirm} from "./confirm";
 
-const pay = StreamTransform('Engagements.pay', async function({domain, uid, payload: {key}}) {
-
-  return [{
-    streamName: 'data.firebase',
-    partitionKey: uid,
-    data: {
-      domain,
-      action: 'update',
-      key,
-      values: {
-        isPaid: true
-      }
-    }
-  }];
-});
-
-
-export default apex(pay);
+export default apex(spread(
+  pay,
+  confirm
+));

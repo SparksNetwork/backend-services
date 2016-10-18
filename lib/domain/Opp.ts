@@ -5,7 +5,7 @@ import {Commitment} from "sparks-schemas/types/models/commitment";
 const SPARKS_RATE = 0.035;
 const SPARKS_MIN = 1.0;
 
-const sum = reduce<Commitment,number>((acc, c) => acc + c.amount, 0);
+const sum = reduce<Commitment,number>((acc, c) => acc + Number(c.amount), 0);
 
 const rateReducer = compose<Commitment[],number,number,number>(
   round,

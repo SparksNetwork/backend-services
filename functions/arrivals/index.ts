@@ -6,6 +6,7 @@ import {Arrival} from "sparks-schemas/types/models/arrival";
 import {lookup} from "../../lib/ExternalFactories/Firebase";
 import {spread} from "../../lib/spread";
 import {RemoveTransform} from "../../helpers/CommandToDataTransform";
+import {dataCreate} from "../../helpers/dataCreate";
 
 const streamName = 'data.firebase';
 
@@ -24,22 +25,13 @@ const create = StreamTransform<ArrivalsCreateCommand, Arrival>('Arrivals.create'
 
   const profileKey = await lookup('arrivals', 'Users', message.uid);
 
-  return [{
-    streamName,
-    partitionKey: message.uid,
-    data: {
-      domain: 'Arrivals',
-      action: 'create',
-      key,
-      values: {
-        arrivedAt: Date.now(),
-        ownerProfileKey: profileKey,
-        projectKeyProfileKey: key,
-        profileKey: values.profileKey,
-        projectKey: values.projectKey
-      }
-    }
-  }];
+  return [dataCreate(message.domain, key, message.uid, {
+    arrivedAt: Date.now(),
+    ownerProfileKey: profileKey,
+    projectKeyProfileKey: key,
+    profileKey: values.profileKey,
+    projectKey: values.projectKey
+  })];
 });
 
 export default apex(spread(create, RemoveTransform('Arrivals.remove')));

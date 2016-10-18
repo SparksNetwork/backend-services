@@ -62,7 +62,7 @@ test.serial('generate payment token on creation', async function(t) {
   t.is(data.action, 'update');
   t.is(data.key, 'opp123-pro123');
   t.deepEqual(data.values, {
-    payment: 'tok123'
+    paymentClientToken: 'tok123'
   });
 });
 

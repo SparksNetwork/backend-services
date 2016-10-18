@@ -4,18 +4,10 @@ import {StreamTransform} from "../../lib/StreamTransform";
 import {AssignmentsCreateCommand} from 'sparks-schemas/types/commands/AssignmentsCreate';
 import {AssignmentsRemoveCommand} from 'sparks-schemas/types/commands/AssignmentsRemove';
 import {RemoveTransform} from "../../helpers/CommandToDataTransform";
+import {dataCreate} from "../../helpers/dataCreate";
 
-const create = StreamTransform('Assignments.create', async function({domain, action, uid, payload: {values}}:AssignmentsCreateCommand) {
-  return [{
-    streamName: 'data.firebase',
-    partitionKey: uid,
-    data: {
-      domain,
-      action,
-      key: [values.oppKey, values.shiftKey].join('-'),
-      values
-    }
-  }];
+const create = StreamTransform('Assignments.create', async function({domain, uid, payload: {values}}:AssignmentsCreateCommand) {
+  return [dataCreate(domain, [values.oppKey, values.shiftKey].join('-'), uid, values)]
 });
 
 export default apex(spread(create, RemoveTransform('Assignments.remove')));

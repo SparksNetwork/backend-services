@@ -46,6 +46,10 @@ export function StreamTransform<T,U>(schema, transform:Transform<T,U>) {
   return StreamFunction<T>(schema, async function(message:T) {
     const records:StreamRecord<U>[] = await transform(message);
 
+    if (!records.reduce) {
+      throw new Error('StreamTransform expects the function to return the promise of an Array of StreamRecord objects');
+    }
+
     const agent = new https.Agent({
       rejectUnauthorized: false
     } as any);

@@ -9,6 +9,7 @@ import {OrganizerInviteEmail} from 'sparks-schemas/types/emails/organizerInvite'
 import {CreateData} from 'sparks-schemas/types/data';
 import {lookup, firebaseUid} from '../../lib/ExternalFactories/Firebase';
 import {Organizer} from "sparks-schemas/types/models/organizer";
+import {dataUpdate} from "../../helpers/dataUpdate";
 
 const DOMAIN = process.env['DOMAIN'];
 
@@ -51,22 +52,11 @@ const create = StreamTransform<any,any>('Organizers.create', async function({dom
 const accept = StreamTransform('Organizers.accept', async function({domain, uid, payload: {key}}:OrganizersAcceptCommand) {
   const profileKey = await lookup('organizers', 'Users', uid);
 
-  return [
-    {
-      streamName: 'data.firebase',
-      partitionKey: uid,
-      data: {
-        domain,
-        action: 'update',
-        key,
-        values: {
-          isAccepted: true,
-          acceptedAt: Date.now(),
-          profileKey
-        }
-      }
-    }
-  ]
+  return [dataUpdate(domain, key, uid, {
+    isAccepted: true,
+    acceptedAt: Date.now(),
+    profileKey
+  })];
 });
 
 export default apex(spread(

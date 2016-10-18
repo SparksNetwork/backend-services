@@ -6,18 +6,11 @@ import {
 import {MembershipsCreateCommand} from 'sparks-schemas/types/commands/MembershipsCreate'
 import {StreamTransform} from "../../lib/StreamTransform";
 import {spread} from "../../lib/spread";
+import {dataCreate} from "../../helpers/dataCreate";
 
-const create = StreamTransform('Memberships.create', async function({domain, action, uid, payload: {values}}:MembershipsCreateCommand) {
-  return [{
-    streamName: 'data.firebase',
-    partitionKey: uid,
-    data: {
-      domain,
-      action,
-      key: [values.engagementKey, values.teamKey, values.oppKey].join('-'),
-      values
-    }
-  }]
+const create = StreamTransform('Memberships.create', async function({domain, uid, payload: {values}}:MembershipsCreateCommand) {
+
+  return [dataCreate(domain, [values.engagementKey, values.teamKey, values.oppKey].join('-'), uid, values)];
 });
 
 export default apex(spread(

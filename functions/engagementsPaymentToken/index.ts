@@ -4,6 +4,7 @@ import {StreamTransform} from "../../lib/StreamTransform";
 import {spread} from "../../lib/spread";
 import {lookup} from "../../lib/ExternalFactories/Firebase";
 import {BraintreeGateway} from "../../lib/ExternalFactories/Braintree";
+import {dataUpdate} from "../../helpers/dataUpdate";
 
 const generatePaymentToken = StreamTransform('Engagements.create', async function({domain, uid, payload: {values}}:EngagementsCreateCommand) {
 
@@ -24,20 +25,9 @@ const generatePaymentToken = StreamTransform('Engagements.create', async functio
     });
   });
 
-  return [
-    {
-      streamName: 'data.firebase',
-      partitionKey: uid,
-      data: {
-        domain,
-        action: 'update',
-        key,
-        values: {
-          payment: clientToken
-        }
-      }
-    }
-  ]
+  return [dataUpdate(domain, key, uid, {
+    paymentClientToken: clientToken
+  })];
 });
 
 export default apex(spread(generatePaymentToken));

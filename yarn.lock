@@ -3044,8 +3044,8 @@ source-map@0.1.32:
     amdefine ">=0.0.4"
 
 "sparks-schemas@github:sparksnetwork/schemas":
-  version "0.0.27"
-  resolved "https://codeload.github.com/sparksnetwork/schemas/tar.gz/42b5c148cd8babb794721ec1e3ff6e93786fab93"
+  version "0.0.28"
+  resolved "https://codeload.github.com/sparksnetwork/schemas/tar.gz/baf8152bdadcbba03b25a27cf1e024199b3b2a4e"
   dependencies:
     ajv "^4.7.7"
 

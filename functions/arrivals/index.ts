@@ -1,14 +1,11 @@
 import * as apex from 'apex.js';
 import {StreamTransform} from "../../lib/StreamTransform";
 import {ArrivalsCreateCommand, ArrivalsCreatePayload} from 'sparks-schemas/types/commands/ArrivalsCreate';
-import {ArrivalsRemoveCommand} from 'sparks-schemas/types/commands/ArrivalsRemove';
 import {Arrival} from "sparks-schemas/types/models/arrival";
 import {lookup} from "../../lib/ExternalFactories/Firebase";
 import {spread} from "../../lib/spread";
 import {RemoveTransform} from "../../helpers/CommandToDataTransform";
 import {dataCreate} from "../../helpers/dataCreate";
-
-const streamName = 'data.firebase';
 
 /**
  * An arrival can only be marked as arrived once

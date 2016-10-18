@@ -2,17 +2,13 @@ import * as apex from 'apex.js';
 import {StreamTransform} from "../../lib/StreamTransform";
 import {
   ProfilesCreateCommand,
-  ProfilesCreatePayload
 } from 'sparks-schemas/types/commands/ProfilesCreate';
 import {ProfilesUpdateCommand} from 'sparks-schemas/types/commands/ProfilesUpdate';
-import {Profile} from 'sparks-schemas/types/models/profile';
-import {lookup, search} from "../../lib/ExternalFactories/Firebase";
+import {search} from "../../lib/ExternalFactories/Firebase";
 import {spread} from "../../lib/spread";
 import {merge} from 'ramda'
 import {dataCreate} from "../../helpers/dataCreate";
 import {dataUpdate} from "../../helpers/dataUpdate";
-
-const streamName = 'data.firebase';
 
 const create = StreamTransform<ProfilesCreateCommand,any>('Profiles.create', async function ({uid, payload: {values}}: ProfilesCreateCommand) {
   const matchingProfiles = await search('profiles', ['uid', uid], 'Profiles');

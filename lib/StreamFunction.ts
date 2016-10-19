@@ -1,4 +1,4 @@
-import {command} from 'sparks-schemas/generator';
+import {command} from 'sparks-schemas/generators/command';
 import Record = Kinesis.Record;
 import ValidateFunction = ajv.ValidateFunction;
 

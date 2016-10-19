@@ -4,7 +4,7 @@ import {test} from 'ava';
 import {EngagementsPayCommand} from 'sparks-schemas/types/commands/EngagementsPay'
 import {EngagementsConfirmCommand} from 'sparks-schemas/types/commands/EngagementsConfirm'
 import {StreamTransform} from "../../test/StreamTransform";
-import {data} from 'sparks-schemas/generator';
+import {data} from 'sparks-schemas/generators/data';
 import {BraintreeGateway} from "../../lib/ExternalFactories/Braintree";
 import {MockFirebase} from "../../test/MockFirebase";
 import {establishConnection} from "../../lib/ExternalFactories/Firebase";

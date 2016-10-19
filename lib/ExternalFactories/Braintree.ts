@@ -1,14 +1,16 @@
-import * as braintree from 'braintree';
-import {Braintree} from "../typings/braintree";
+const braintree = require('braintree');
+import {GatewayOptions, Gateway} from "../../typings/braintree";
 
 const cfg = process.env as any;
 
-let staticGateway:Braintree.Gateway;
+let staticGateway: Gateway;
 
 export function BraintreeGateway(gateway?) {
-  if (gateway) { staticGateway = gateway; }
+  if (gateway) {
+    staticGateway = gateway;
+  }
   if (!staticGateway) {
-    const options:Braintree.GatewayOptions = {
+    const options: GatewayOptions = {
       environment: braintree.Environment[cfg.BT_ENVIRONMENT],
       merchantId: cfg.BT_MERCHANT_ID,
       publicKey: cfg.BT_PUBLIC_KEY,

@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "ava \"**/*test.js\""
+    "test": "ava \"**/*test.js\"",
+    "test:watch": "ava \"**/*test.js\" -w"
   },
   "author": "",
   "license": "ISC",

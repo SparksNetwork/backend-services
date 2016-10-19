@@ -1,0 +1,54 @@
+import * as https from 'https';
+import {Kinesis} from 'aws-sdk';
+import {compose, toPairs, groupBy, prop, splitEvery} from 'ramda';
+
+export interface StreamRecord<U> {
+  streamName:string;
+  partitionKey:string;
+  data:U;
+}
+
+/**
+ * Take an array of StreamRecords that might be destined for different streams
+ * and group by the target stream name.
+ *
+ * @param records
+ * @returns {any}
+ */
+function byStream<T>(records:StreamRecord<T>[]):[string, StreamRecord<T>[]][] {
+  return compose<StreamRecord<T>[], any, [string, StreamRecord<T>[]][]>(
+    toPairs,
+    groupBy<StreamRecord<T>>(prop('streamName'))
+  )(records);
+}
+
+function putRecords(kinesis:Kinesis, streamName:string, records:StreamRecord<any>[]):Promise<any> {
+
+  return Promise.all(
+    splitEvery(100, records).map(innerRecords => {
+      return kinesis.putRecords({
+        StreamName: streamName,
+        Records: innerRecords.map(record => ({
+          PartitionKey: record.partitionKey,
+          Data: new Buffer(JSON.stringify(record.data))
+        }))
+      }).promise()
+    })
+  );
+}
+
+export function StreamPublish(records:StreamRecord<any>[]):Promise<any> {
+  const agent = new https.Agent({
+    rejectUnauthorized: false
+  } as any);
+
+  const kinesis = new Kinesis({
+    endpoint: process.env['KINESIS_ENDPOINT'],
+    httpOptions: {agent}
+  });
+
+  return Promise.all(
+    byStream(records).map(([streamName, records]) =>
+      putRecords(kinesis, streamName, records))
+  );
+}

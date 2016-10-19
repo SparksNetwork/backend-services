@@ -1,5 +1,5 @@
 import {CreateData} from 'sparks-schemas/types/data'
-import {StreamRecord} from '../lib/StreamTransform';
+import {StreamRecord} from "../lib/StreamPublish";
 
 export function dataCreate(domain:string, key:string, partitionKey:string, values:any):StreamRecord<CreateData<any>> {
   return {

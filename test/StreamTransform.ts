@@ -1,7 +1,7 @@
 import {StreamFunction} from "./StreamFunction";
 import {SinonStub} from "sinon";
-import {StreamRecord} from "../lib/StreamTransform";
 import {flatten} from 'ramda'
+import {StreamRecord} from "../lib/StreamPublish";
 const AWS = require('aws-sdk-mock');
 
 /**

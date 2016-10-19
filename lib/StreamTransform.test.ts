@@ -1,5 +1,5 @@
 import {test} from 'ava';
-import {StreamTransform, StreamRecord} from "../lib/StreamTransform";
+import {StreamTransform} from "../lib/StreamTransform";
 import {SinonStub} from "sinon";
 const AWS = require('aws-sdk-mock');
 
@@ -14,7 +14,7 @@ const inputRecord:Kinesis.Record = {
 test.afterEach(() => AWS.restore());
 
 test.serial('single record', async function(t) {
-  const func = StreamTransform(() => true, async function(message):Promise<StreamRecord<any>[]> {
+  const func = StreamTransform(() => true, async function() {
     return [{
       streamName: "test-stream",
       partitionKey: "moose",
@@ -42,7 +42,7 @@ test.serial('single record', async function(t) {
 });
 
 test.serial('multiple records', async function(t) {
-  const func = StreamTransform(() => true, async function(message):Promise<StreamRecord<any>[]> {
+  const func = StreamTransform(() => true, async function():Promise<any[]> {
     return [
       {
         streamName: "test-stream",
@@ -83,7 +83,7 @@ test.serial('multiple records', async function(t) {
 });
 
 test.serial('multiple records to multiple streams', async function(t) {
-  const func = StreamTransform(() => true, async function(message):Promise<StreamRecord<any>[]> {
+  const func = StreamTransform(() => true, async function():Promise<any[]> {
     return [
       {
         streamName: "test-stream",
@@ -130,7 +130,7 @@ test.serial('multiple records to multiple streams', async function(t) {
 });
 
 test.serial('error in transform function', async function(t) {
-  const func = StreamTransform(() => true, async function(message):Promise<any> {
+  const func = StreamTransform(() => true, async function():Promise<any> {
     throw new Error('An error');
   })
 

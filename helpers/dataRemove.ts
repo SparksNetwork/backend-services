@@ -1,5 +1,5 @@
 import {RemoveData} from 'sparks-schemas/types/data'
-import {StreamRecord} from '../lib/StreamTransform';
+import {StreamRecord} from "../lib/StreamPublish";
 
 /**
  * Helper to produce data update messages

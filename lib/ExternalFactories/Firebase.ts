@@ -43,12 +43,6 @@ export function establishConnection(name:string, cn?:any) {
   return app;
 }
 
-export function connect(name:string, fn):Function {
-  return function(...args) {
-    return fn(...args, establishConnection(name));
-  }
-}
-
 /**
  * Return the ref of an app at a given path
  *

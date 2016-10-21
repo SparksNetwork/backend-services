@@ -59,7 +59,7 @@ test.serial('create message', async function(t) {
   m.verify();
 });
 
-test('invalid create message', async function(t) {
+test.serial('invalid create message', async function(t) {
   const m = mock(db.database().ref().child('Arrivals'));
   m.expects('push').never();
 

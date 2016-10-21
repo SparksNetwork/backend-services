@@ -22,8 +22,16 @@ function byStream<T>(records:StreamRecord<T>[]):[string, StreamRecord<T>[]][] {
   )(records);
 }
 
+/**
+ * This function puts records on to a single kinesis stream, given by streamName.
+ * It will split the records into batches of 100 to avoid the kinesis limits.
+ *
+ * @param kinesis
+ * @param streamName
+ * @param records
+ * @returns {Promise<Kinesis.PutRecordsResponse[]>}
+ */
 function putRecords(kinesis:Kinesis, streamName:string, records:StreamRecord<any>[]):Promise<any> {
-
   return Promise.all(
     splitEvery(100, records).map(innerRecords => {
       return kinesis.putRecords({
@@ -37,6 +45,14 @@ function putRecords(kinesis:Kinesis, streamName:string, records:StreamRecord<any
   );
 }
 
+/**
+ * Publish records to kinesis. This function will handle publishing the records
+ * to different streams and splitting the records into batches.
+ *
+ * @param records
+ * @returns {Promise<TAll[]>}
+ * @constructor
+ */
 export function StreamPublish(records:StreamRecord<any>[]):Promise<any> {
   const agent = new https.Agent({
     rejectUnauthorized: false

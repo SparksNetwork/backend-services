@@ -1,0 +1,27 @@
+#!/bin/sh
+
+FN_DIR=$(pwd)
+cd ../..
+
+rm $FN_DIR/*.js $FN_DIR/*.map || true
+
+echo "[Build] typscript"
+tsc
+
+echo "[Build] browserify"
+browserify --debug --node -s default -t babelify $FN_DIR/index.js \
+    | exorcist $FN_DIR/bundle.js.map > $FN_DIR/bundle.js
+
+echo "[Build] babel"
+babel \
+    --no-babelrc \
+    --no-comments \
+    --minified \
+    --compact true \
+    --input-source-map $FN_DIR/bundle.js.map \
+    --inputSourceMap=$FN_DIR/bundle.js.map \
+    --source-maps inline \
+    $FN_DIR/bundle.js \
+    | exorcist $FN_DIR/main.js.map > $FN_DIR/main.js
+
+rm $FN_DIR/bundle.js $FN_DIR/index.js || true

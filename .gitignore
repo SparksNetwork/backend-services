@@ -4,3 +4,4 @@ functions/**/*.js
 lib/**/*.js
 test/**/*.js
 **/*.map
+infrastructure/.terraform

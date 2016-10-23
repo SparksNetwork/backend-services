@@ -1,12 +1,12 @@
 {
   "name": "sparks",
   "description": "",
-  "memory": 128,
-  "timeout": 5,
-  "role": "arn:aws:iam::878160042194:role/sparks_lambda_function",
+  "memory": 256,
+  "timeout": 60,
+  "role": "arn:aws:iam::878160042194:role/sparks_lambda20161023233051502059394opr",
   "environment": {},
   "runtime": "nodejs4.3",
   "hooks": {
-    "build": "tsc"
+    "build": "../../bin/build"
   }
 }

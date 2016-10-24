@@ -10,7 +10,7 @@ resource "aws_lambda_event_source_mapping" "${functionName}-${streamName}" {
   batch_size        = ${config.batchSize || 1}
   event_source_arn  = "${streamArn}"
   enabled           = true
-  function_name     = "${functionName}"
+  function_name     = "\${var.apex_function_${functionName}}"
   starting_position = "LATEST"
 }`;
 }

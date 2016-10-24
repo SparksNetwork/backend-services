@@ -1,0 +1,8 @@
+#!/bin/bash
+
+node bin/variables.js > infrastructure/variables.tf
+node bin/attach.js > infrastructure/attach.tf
+apex list --tfvars > infrastructure/terraform.tfvars
+
+cd infrastructure
+terraform plan -out=terraform.plan "$@"

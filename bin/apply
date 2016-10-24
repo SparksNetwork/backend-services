@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd infrastructure
+terraform apply terraform.plan && rm terraform.plan

@@ -15,6 +15,11 @@ for m in $FUNCS; do
             echo "Changes in $m"
             MFUNCS+=($m)
         fi
+        F=$(find . -not -ipath '*node_modules*' -not -ipath '*functions*' -not -ipath '*bin*' -not -ipath '*test*' -iname "*.ts" -newer $ZIP)
+        if [ -n "$F" ]; then
+            echo "Global change for $m"
+            MFUNCS+=($m)
+        fi
     fi
 done
 

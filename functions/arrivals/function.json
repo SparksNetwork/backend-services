@@ -1,3 +1,5 @@
 {
-  "stream": "commands"
+  "stream": "commands",
+  "environment": {
+  }
 }

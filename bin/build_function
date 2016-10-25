@@ -3,9 +3,4 @@
 FN_DIR=$1
 cd $FN_DIR
 cd ../..
-
-gsed '1a require\("source-map-support"\).install\(\);' -i'' $FN_DIR/index.js
-
-echo "[Build] browserify"
-browserify --debug --node -s default -t babelify $FN_DIR/index.js \
-    | exorcist $FN_DIR/main.js.map > $FN_DIR/main.js
+node bin/build_function.js $FN_DIR

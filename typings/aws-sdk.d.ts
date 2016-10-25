@@ -13,6 +13,7 @@ interface ServiceOptions {
   paramValidation?:any;
   convertResponseTypes?:boolean;
   correctClockSkew?:boolean;
+  signatureVersion?:string;
   httpOptions?: {
     proxy?:string;
     agent?:any;
@@ -219,6 +220,49 @@ declare namespace S3 {
     ServerSideEncryption?: 'AES256' | 'aws:kms';
     VersionId?: string;
   }
+
+  interface GetObjectParams extends Params {
+    Bucket?:string;
+    Key?:string;
+    IfMatch?:string;
+    IfModifiedSince?:Date | string | number;
+    IfNoneMatch?:string;
+    IfUnmodifiedSince?:Date | string | number;
+    Range?: string;
+    ResponseCacheControl?: string;
+    ResponseContentDisposition?: string;
+    ResponseContentEncoding?: string;
+    ResponseContentLanguage?: string;
+    ResponseContentType?: string;
+    ResponseExpires?: Date | string | number;
+    VersionId?: string;
+  }
+
+  interface GetObjectResponse extends Response {
+    Body: Buffer | string;
+    DeleteMarker?: boolean;
+    AcceptRanges?: string;
+    Expiration?: string;
+    Restore?: string;
+    LastModified?: Date;
+    ContentLength: number;
+    ETag: string;
+    MissingMeta?: number;
+    VersionId?: string;
+    CacheControl?: string;
+    ContentDisposition?: string;
+    ContentEncoding?: string;
+    ContentLanguage?: string;
+    ContentRange?: string;
+    ContentType?: string;
+    Expires?: Date;
+    WebsiteRedirectLocation?: string;
+    ServerSideEncryption?: string;
+    Metadata?:{};
+    StorageClass?: 'STANDARD' | 'REDUCED_REDUNDANCY' | 'STANDARD_IA';
+    RequestCharged?: string;
+    ReplicationStatus?: 'COMPLETE' | 'PENDING' | 'FAILED' | 'REPLICA';
+  }
 }
 
 declare module 'aws-sdk' {
@@ -254,5 +298,6 @@ declare module 'aws-sdk' {
     constructor(options?: S3.Options);
 
     putObject(params: S3.PutObjectParams, callback?: Callback<S3.PutObjectResponse>): Response<S3.PutObjectResponse>;
+    getObject(params: S3.GetObjectParams, callback?: Callback<S3.GetObjectResponse>): Response<S3.GetObjectResponse>;
   }
 }

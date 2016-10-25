@@ -626,6 +626,46 @@ resource "aws_iam_role_policy" "users-stream" {
 }
 JSON
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+resource "aws_iam_role_policy" "s3Writer-custom" {
+  name = "custom"
+  role = "${aws_iam_role.s3Writer.id}"
+  policy = <<JSON
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "s3:*"
+      ],
+      "Effect": "Allow",
+      "Resource": [
+        "${aws_s3_bucket.streams.arn}"
+      ]
+    }
+  ]
+}
+JSON
+}
+
+
+
 resource "aws_iam_policy_attachment" "logs" {
   name = "logs"
   policy_arn = "${aws_iam_policy.logs.arn}"

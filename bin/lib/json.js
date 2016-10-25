@@ -1,11 +1,11 @@
 "use strict";
-const fs = require('fs');
+var fs = require("fs");
 function readJsonFile(path, cb) {
     fs.readFile(path, function (err, data) {
         if (err) {
             return cb(err, null);
         }
-        let obj;
+        var obj;
         try {
             obj = JSON.parse(data);
         }
@@ -18,7 +18,7 @@ function readJsonFile(path, cb) {
 exports.readJsonFile = readJsonFile;
 function writeJsonFile(path, obj, cb) {
     try {
-        const data = new Buffer(JSON.stringify(obj, null, 2));
+        var data = new Buffer(JSON.stringify(obj, null, 2));
         fs.writeFile(path, data, cb);
     }
     catch (error) {

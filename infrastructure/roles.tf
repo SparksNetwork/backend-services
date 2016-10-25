@@ -656,7 +656,8 @@ resource "aws_iam_role_policy" "s3Writer-custom" {
       ],
       "Effect": "Allow",
       "Resource": [
-        "${aws_s3_bucket.streams.arn}"
+        "${aws_s3_bucket.streams.arn}",
+        "${aws_s3_bucket.streams.arn}/*"
       ]
     }
   ]

@@ -28,7 +28,7 @@ function gzip(data):Promise<Buffer> {
 
 function savePartition(streamName:string, partitionKey:string, records:Lambda.KinesisEventRecord[]) {
   const sequenceNumbers = records.map(r => r.kinesis.sequenceNumber);
-  const [from, to] = [head(sequenceNumbers), last(sequenceNumbers)]
+  const [from, to] = [head(sequenceNumbers), last(sequenceNumbers)];
   const key = [streamName, partitionKey, [from, to].join('-')].join('/');
   const data = records.map(record => record.kinesis.data.trim()).join("\n");
 
@@ -38,7 +38,11 @@ function savePartition(streamName:string, partitionKey:string, records:Lambda.Ki
         Body: buffer,
         ContentEncoding: 'gzip'
       }).promise()
-    );
+    ).then(s3Response => ({
+      Key: key,
+      Bucket: bucket,
+      ETag: s3Response.ETag
+    }));
 }
 
 export default apex(async function(event:Lambda.KinesisEvent) {

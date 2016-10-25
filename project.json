@@ -8,7 +8,7 @@
   "runtime": "nodejs4.3",
   "handler": "main.default",
   "hooks": {
-    "build": "../../bin/build_function",
+    "build": "../../bin/build_function `pwd`",
     "clean": "rm main.js main.js.map"
   }
 }

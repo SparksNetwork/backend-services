@@ -1,36 +1,30 @@
 "use strict";
 function configToString(config) {
     return Object.keys(config).map(function (key) {
-        const val = config[key];
+        var val = config[key];
         if (val.map) {
-            return `  ${key} = [${val.map(v => `"${v}"`).join(', ')}]`;
+            return "  " + key + " = [" + val.map(function (v) { return "\"" + v + "\""; }).join(', ') + "]";
         }
         if (typeof val === 'object') {
-            return `  ${key} {
-  ${configToString(val)}
-}`;
+            return "  " + key + " {\n  " + configToString(val) + "\n}";
         }
         if (typeof val === 'string') {
-            return `  ${key} = "${val}"`;
+            return "  " + key + " = \"" + val + "\"";
         }
         if (typeof val === 'function') {
             return val(key);
         }
-        return `  ${key} = ${val}`;
+        return "  " + key + " = " + val;
     }).join("\n");
 }
 function resource(type, name, config) {
-    return `resource "${type}" "${name}" {
-${configToString(config)}
-}`;
+    return "resource \"" + type + "\" \"" + name + "\" {\n" + configToString(config) + "\n}";
 }
 exports.resource = resource;
 function terraformJson(object) {
     return function (key) {
-        const objString = JSON.stringify(object, null, 2);
-        return `  ${key} = <<JSON
-${objString}
-JSON`;
+        var objString = JSON.stringify(object, null, 2);
+        return "  " + key + " = <<JSON\n" + objString + "\nJSON";
     };
 }
 exports.terraformJson = terraformJson;

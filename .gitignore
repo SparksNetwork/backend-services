@@ -5,3 +5,4 @@ lib/**/*.js
 test/**/*.js
 **/*.map
 infrastructure/.terraform
+dist/

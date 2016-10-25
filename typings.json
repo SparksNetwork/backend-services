@@ -3,6 +3,7 @@
     "node": "registry:env/node#6.0.0+20160918225031"
   },
   "dependencies": {
+    "async": "registry:npm/async#2.0.1+20160815105832",
     "node-uuid": "registry:npm/node-uuid#1.4.7+20160723033700",
     "ramda": "registry:npm/ramda#0.21.0+20160531162943",
     "sinon": "registry:npm/sinon#1.16.0+20160723033700"

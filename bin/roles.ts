@@ -1,90 +1,80 @@
-import * as fs from 'fs';
 import ErrnoException = NodeJS.ErrnoException;
+import {getFunctions, ApexFunction} from "./lib/apex";
+import {exitErr} from "./lib/util";
+import {resource, terraformJson} from "./lib/terraform";
 
-let left:number = 0;
-const roles = [];
-
-function errExit(error) {
-  console.error('An error:');
-  console.error(error);
-  process.exit(1);
-}
-
-function showOutput() {
-  left -= 1;
-  if (left !== 0) { return; }
-  console.log(roles.join("\n"))
-}
-
-function generateRole(fnName, path) {
-  return `
-resource "aws_iam_role" "${fnName}" {
-  name = "sparks_${fnName}"
-  path = "/"
-  assume_role_policy = "\${file("policies/lambda.json")}"
-}
-`
-}
-
-function readJsonFile(path:string, cb:(err:Error, object:{}) => void) {
-  fs.readFile(path, function(err, data) {
-    if (err) { return cb(err, null); }
-    try {
-      const obj = JSON.parse(data as any);
-      cb(null, obj);
-    } catch(error) {
-      cb(error, null);
+function generateRole(fn:ApexFunction) {
+  return resource("aws_iam_role", fn.name, {
+    name_prefix: fn.name,
+    path: '/',
+    assume_role_policy: '${file("policies/lambda.json")}',
+    lifecycle: {
+      create_before_destroy: true
     }
   });
 }
 
-function writeJsonFile(path:string, obj:{}, cb:(err:Error) => void) {
-  try {
-    const data = new Buffer(JSON.stringify(obj));
-    fs.writeFile(path, data, cb);
-  } catch(error) {
-    cb(error);
-  }
+function generateRolePolicy(fn:ApexFunction) {
+  const streamName = fn.config['stream'].replace('.', '_');
+
+  return resource("aws_iam_role_policy", [fn.name, 'stream'].join('-'), {
+    name: streamName,
+    role: `\${aws_iam_role.${fn.name}.id}`,
+    policy: terraformJson({
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Action": [
+            "kinesis:ListStreams",
+            "kinesis:DescribeStream",
+            "kinesis:GetRecords",
+            "kinesis:GetShardIterator"
+          ],
+          "Effect": "Allow",
+          "Resource": [
+            `\${data.terraform_remote_state.main.${streamName}_arn}`
+          ]
+        }
+      ]
+    })
+  })
 }
 
-function writeRoleArn(path:string, arn:string, cb:(err:Error) => void) {
-  fs.exists(`${path}/function.json`, function(exists) {
-    if (exists) {
-      readJsonFile(`${path}/function.json`, function(err, object) {
-        object['role'] = arn;
-        writeJsonFile(`${path}/function.json`, object, cb);
-      });
-    } else {
-      writeJsonFile(`${path}/function.json`, {role: arn}, cb);
+getFunctions(function(err, functions) {
+  if (err) { exitErr(err); }
+
+  functions.forEach(function(fn) {
+    console.log(generateRole(fn));
+
+    if (fn.config['stream']) {
+      console.log(generateRolePolicy(fn));
     }
   });
-}
 
-fs.readdir('functions', function(err, files) {
-  if (err) {
-    throw err;
-  }
-  left = files.length;
+  const roles = functions.map(fn => `\${aws_iam_role.${fn.name}.id}`);
 
-  files.forEach(file => {
-    fs.stat(`functions/${file}`, function (err, stats) {
-      if (err) {
-        return showOutput();
-      }
-      if (!stats.isDirectory()) {
-        return showOutput();
-      }
+  console.log(
+    resource("aws_iam_policy_attachment", "logs", {
+      name: "logs",
+      policy_arn: "${aws_iam_policy.logs.arn}",
+      roles
+    })
+  );
 
-      roles.push(
-        generateRole(file, `functions/${file}`)
-      );
+  console.log(
+    resource("aws_iam_policy_attachment", "write-to-data-firebase", {
+      name: "write-to-data-firebase-attachment",
+      policy_arn: "${aws_iam_policy.write-to-data-firebase.arn}",
+      roles
+    })
+  );
 
-      const roleArn = `arn:aws:iam::878160042194:role/sparks_${file}`;
-
-      writeRoleArn(`functions/${file}`, roleArn, function(err) {
-        if (err) { return errExit(err); }
-        showOutput();
-      });
-    });
-  });
+  console.log(
+    resource("aws_iam_policy_attachment", "write-to-data-emails", {
+      name: "write-to-data-emails-attachment",
+      policy_arn: "${aws_iam_policy.write-to-data-emails.arn}",
+      roles
+    })
+  );
 });
+

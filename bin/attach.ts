@@ -1,56 +1,26 @@
-import * as fs from 'fs';
-
-const functions = {};
-let left:number = -1;
+import {resource} from "./lib/terraform";
+import {getFunctions} from "./lib/apex";
+import {exitErr} from "./lib/util";
 
 function generateConfig(functionName:string, config:{stream:string, batchSize?:number}) {
   const streamName = config.stream.replace('.', '_');
   const streamArn = `\${data.terraform_remote_state.main.${streamName}_arn}`;
 
-  return `
-resource "aws_lambda_event_source_mapping" "${functionName}-${streamName}" {
-  batch_size        = ${config.batchSize || 1}
-  event_source_arn  = "${streamArn}"
-  enabled           = true
-  function_name     = "\${var.apex_function_${functionName}}"
-  starting_position = "LATEST"
-}`;
-}
-
-function showOutput() {
-  left -= 1;
-  if (left !== 0) { return; }
-
-  Object.keys(functions).forEach(fn => {
-    console.log(functions[fn]);
+  return resource("aws_lambda_event_source_mapping", [functionName, streamName].join('-'), {
+    batch_size: config.batchSize || 1,
+    event_source_arn: streamArn,
+    enabled: true,
+    function_name: `\${aws_lambda_function.${functionName}.arn}`,
+    starting_position: "LATEST",
+    depends_on: [`aws_iam_role_policy.${functionName}-stream`]
   });
 }
 
-fs.readdir('functions', function(err, files) {
-  if (err) { throw err; }
-  left = files.length;
+getFunctions(function(err, functions) {
+  if (err) { exitErr(err); }
 
-  files.forEach(file => {
-    fs.stat(`functions/${file}`, function(err, stats) {
-      if (err) { return showOutput(); }
-      if (!stats.isDirectory()) { return showOutput(); }
-
-      fs.exists(`functions/${file}/function.json`, function(exists) {
-        if (!exists) { return showOutput(); }
-
-        fs.readFile(`functions/${file}/function.json`, function(err, data) {
-          if (err) { return showOutput(); }
-
-          try {
-            const config = JSON.parse(data as any);
-            functions[file] = generateConfig(file, config);
-          } catch(err) {
-            left--;
-          }
-
-          showOutput();
-        })
-      });
-    });
+  functions.filter(fn => fn.config['stream']).forEach(function(fn) {
+    console.log(generateConfig(fn.name, fn.config as any))
   });
 });
+

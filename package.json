@@ -10,9 +10,11 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "async": "^2.1.2",
     "ava": "^0.16.0",
     "aws-sdk-mock": "^1.5.0",
     "babel-cli": "^6.16.0",
+    "babelify": "^7.3.0",
     "browserify": "^13.1.0",
     "exorcist": "^0.4.0",
     "sinon": "^1.17.6",

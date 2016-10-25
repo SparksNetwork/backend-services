@@ -6,8 +6,9 @@
   "role": "arn:aws:iam::878160042194:role/sparks_lambda20161023233051502059394opr",
   "environment": {},
   "runtime": "nodejs4.3",
+  "handler": "main.default",
   "hooks": {
-    "build": "../../bin/build",
+    "build": "../../bin/build_function",
     "clean": "rm main.js"
   }
 }

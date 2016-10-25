@@ -1,86 +1,66 @@
 "use strict";
-const fs = require('fs');
-let left = 0;
-const roles = [];
-function errExit(error) {
-    console.error('An error:');
-    console.error(error);
-    process.exit(1);
-}
-function showOutput() {
-    left -= 1;
-    if (left !== 0) {
-        return;
-    }
-    console.log(roles.join("\n"));
-}
-function generateRole(fnName, path) {
-    return `
-resource "aws_iam_role" "${fnName}" {
-  name = "sparks_${fnName}"
-  path = "/"
-  assume_role_policy = "\${file("policies/lambda.json")}"
-}
-`;
-}
-function readJsonFile(path, cb) {
-    fs.readFile(path, function (err, data) {
-        if (err) {
-            return cb(err, null);
-        }
-        try {
-            const obj = JSON.parse(data);
-            cb(null, obj);
-        }
-        catch (error) {
-            cb(error, null);
+const apex_1 = require("./lib/apex");
+const util_1 = require("./lib/util");
+const terraform_1 = require("./lib/terraform");
+function generateRole(fn) {
+    return terraform_1.resource("aws_iam_role", fn.name, {
+        name_prefix: fn.name,
+        path: '/',
+        assume_role_policy: '${file("policies/lambda.json")}',
+        lifecycle: {
+            create_before_destroy: true
         }
     });
 }
-function writeJsonFile(path, obj, cb) {
-    try {
-        const data = new Buffer(JSON.stringify(obj));
-        fs.writeFile(path, data, cb);
-    }
-    catch (error) {
-        cb(error);
-    }
-}
-function writeRoleArn(path, arn, cb) {
-    fs.exists(`${path}/function.json`, function (exists) {
-        if (exists) {
-            readJsonFile(`${path}/function.json`, function (err, object) {
-                object['role'] = arn;
-                writeJsonFile(`${path}/function.json`, object, cb);
-            });
-        }
-        else {
-            writeJsonFile(`${path}/function.json`, { role: arn }, cb);
-        }
-    });
-}
-fs.readdir('functions', function (err, files) {
-    if (err) {
-        throw err;
-    }
-    left = files.length;
-    files.forEach(file => {
-        fs.stat(`functions/${file}`, function (err, stats) {
-            if (err) {
-                return showOutput();
-            }
-            if (!stats.isDirectory()) {
-                return showOutput();
-            }
-            roles.push(generateRole(file, `functions/${file}`));
-            const roleArn = `arn:aws:iam::878160042194:role/sparks_${file}`;
-            writeRoleArn(`functions/${file}`, roleArn, function (err) {
-                if (err) {
-                    return errExit(err);
+function generateRolePolicy(fn) {
+    const streamName = fn.config['stream'].replace('.', '_');
+    return terraform_1.resource("aws_iam_role_policy", [fn.name, 'stream'].join('-'), {
+        name: streamName,
+        role: `\${aws_iam_role.${fn.name}.id}`,
+        policy: terraform_1.terraformJson({
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Action": [
+                        "kinesis:ListStreams",
+                        "kinesis:DescribeStream",
+                        "kinesis:GetRecords",
+                        "kinesis:GetShardIterator"
+                    ],
+                    "Effect": "Allow",
+                    "Resource": [
+                        `\${data.terraform_remote_state.main.${streamName}_arn}`
+                    ]
                 }
-                showOutput();
-            });
-        });
+            ]
+        })
     });
+}
+apex_1.getFunctions(function (err, functions) {
+    if (err) {
+        util_1.exitErr(err);
+    }
+    functions.forEach(function (fn) {
+        console.log(generateRole(fn));
+        if (fn.config['stream']) {
+            console.log(generateRolePolicy(fn));
+        }
+    });
+    const roles = functions.map(fn => `\${aws_iam_role.${fn.name}.id}`);
+    console.log(terraform_1.resource("aws_iam_policy_attachment", "logs", {
+        name: "logs",
+        policy_arn: "${aws_iam_policy.logs.arn}",
+        roles
+    }));
+    console.log(terraform_1.resource("aws_iam_policy_attachment", "write-to-data-firebase", {
+        name: "write-to-data-firebase-attachment",
+        policy_arn: "${aws_iam_policy.write-to-data-firebase.arn}",
+        roles
+    }));
+    console.log(terraform_1.resource("aws_iam_policy_attachment", "write-to-data-emails", {
+        name: "write-to-data-emails-attachment",
+        policy_arn: "${aws_iam_policy.write-to-data-emails.arn}",
+        roles
+    }));
 });
 //# sourceMappingURL=roles.js.map

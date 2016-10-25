@@ -1,8 +1,12 @@
 #!/bin/bash
 
-node bin/variables.js > infrastructure/variables.tf
+echo "Writing roles"
+node bin/roles.js > infrastructure/roles.tf
+echo "Writing attachments"
 node bin/attach.js > infrastructure/attach.tf
-apex list --tfvars > infrastructure/terraform.tfvars
+echo "Writing functions"
+node bin/lambda.js > infrastructure/lambda.tf
 
+echo "Planning"
 cd infrastructure
 terraform plan -out=terraform.plan "$@"

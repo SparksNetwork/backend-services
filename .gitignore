@@ -5,4 +5,5 @@ lib/**/*.js
 test/**/*.js
 **/*.map
 infrastructure/.terraform
+infrastructure/terraform.plan
 dist/

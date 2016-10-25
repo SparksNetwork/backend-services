@@ -9,6 +9,6 @@
   "handler": "main.default",
   "hooks": {
     "build": "../../bin/build_function",
-    "clean": "rm main.js"
+    "clean": "rm main.js main.js.map"
   }
 }

@@ -4,9 +4,12 @@ import {
   firebaseUid
 } from "../../lib/ExternalFactories/Firebase";
 import {merge, omit} from 'ramda';
-import {Notification} from ''
 
 const MAX_TIME = 1000*60;
+
+interface Notification {
+  lockKey: string;
+}
 
 function ref(key) {
   const db = establishConnection('notifications');

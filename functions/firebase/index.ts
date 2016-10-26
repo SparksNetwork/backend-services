@@ -1,5 +1,4 @@
 import * as apex from 'apex.js'
-import Record = Kinesis.Record;
 import {spread} from "../../lib/spread";
 import * as Ajv from 'ajv';
 import {CreateData, UpdateData, RemoveData} from 'sparks-schemas/types/data'

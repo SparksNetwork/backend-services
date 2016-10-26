@@ -64,6 +64,25 @@ function getShards() {
         }
     });
 }
+function StreamRecordToEvent(record) {
+    return {
+        Records: [{
+                awsRegion: 'us-west-2',
+                eventName: 'aws:kinesis:record',
+                eventSource: 'aws:kinesis',
+                eventSourceARN: 'arn:aws:simulated/stream',
+                eventVersion: '1.0.0',
+                invokeIdentityArn: 'arn:aws:simulated',
+                eventID: '0001',
+                kinesis: {
+                    kinesisSchemaVersion: '1.0.0',
+                    sequenceNumber: record.SequenceNumber,
+                    partitionKey: record.PartitionKey,
+                    data: record.Data.toString('base64')
+                }
+            }]
+    };
+}
 function start() {
     return __awaiter(this, void 0, void 0, function* () {
         const shards = yield getShards();
@@ -77,8 +96,9 @@ function start() {
         const stream = unique('SequenceNumber');
         streams.forEach(s => s.pipe(stream));
         stream.on('data', data => {
+            const event = StreamRecordToEvent(data);
             fns.forEach(fn => {
-                fn(data, {}, function (err, data) {
+                fn(event, {}, function (err, data) {
                     console.log(err, data);
                 });
             });

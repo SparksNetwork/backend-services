@@ -1,6 +1,7 @@
 import {command} from 'sparks-schemas/generators/command';
 import Record = Kinesis.Record;
 import ValidateFunction = ajv.ValidateFunction;
+import KinesisEventRecord = Lambda.KinesisEventRecord;
 
 type SchemaFunction = (message:any) => boolean | Promise<boolean>;
 type ValidationOption = ValidateFunction | SchemaFunction | string | null;
@@ -16,6 +17,22 @@ async function createValidationFunction(fromp:ValidationArg):Promise<SchemaFunct
   }
 
   return from as any;
+}
+
+function executeFnIfSchema<T>(fn:(message:T) => Promise<any>, schemaFn:(message) => Promise<boolean> | boolean) {
+  return async function(record:Lambda.KinesisRecord) {
+    const data = new Buffer(record.data, 'base64');
+    const message = JSON.parse(data as any) as T;
+    const valid = await Promise.resolve(schemaFn(message));
+
+    if(valid) {
+      return await fn(message);
+    }
+  }
+}
+
+function unwrapEvent(e:KinesisEventRecord) {
+  return e.kinesis;
 }
 
 /**
@@ -37,13 +54,9 @@ async function createValidationFunction(fromp:ValidationArg):Promise<SchemaFunct
 export function StreamFunction<T>(schema: ValidationArg, fn:(message:T) => Promise<any>) {
   const schemaPromise = createValidationFunction(schema);
 
-  return async function(e:Record) {
+  return async function(e:Lambda.KinesisEvent) {
     const schemaFn = await schemaPromise;
-    const message = JSON.parse(e.Data as any) as T;
-    const valid = await Promise.resolve(schemaFn(message));
-
-    if(valid) {
-      return await fn(message);
-    }
+    const executeFn = executeFnIfSchema(fn, schemaFn);
+    return Promise.all(e.Records.map(unwrapEvent).map(executeFn));
   };
 }

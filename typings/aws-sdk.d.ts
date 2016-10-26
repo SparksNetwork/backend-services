@@ -1,25 +1,52 @@
+interface ServiceOptions {
+  apiVersion?:string;
+  endpoint?:string;
+  accessKeyId?:string;
+  secretAccessKey?:string;
+  sessionToken?:string;
+  credentials?:any;
+  credentialProvider?:any;
+  region?:string;
+  maxRetries?:number;
+  maxRedirects?:number;
+  sslEnabled?:boolean;
+  paramValidation?:any;
+  convertResponseTypes?:boolean;
+  correctClockSkew?:boolean;
+  httpOptions?: {
+    proxy?:string;
+    agent?:any;
+    timeout?:number;
+  };
+}
+
+declare namespace Lambda {
+  interface KinesisRecord {
+    partitionKey: string;
+    kinesisSchemaVersion: string;
+    data: string;
+    sequenceNumber: string;
+  }
+
+  interface KinesisEventRecord {
+    kinesis: KinesisRecord;
+    eventSource: "aws:kinesis";
+    eventID: string;
+    invokeIdentityArn: string;
+    eventVersion: string;
+    eventName: "aws:kinesis:record";
+    eventSourceARN: string;
+    awsRegion: string;
+  }
+
+  interface KinesisEvent {
+    Records:KinesisEventRecord[];
+  }
+}
+
 declare namespace Kinesis {
-  interface Options {
-    apiVersion?:string;
+  interface Options extends ServiceOptions {
     params?:any;
-    endpoint?:string;
-    accessKeyId?:string;
-    secretAccessKey?:string;
-    sessionToken?:string;
-    credentials?:any;
-    credentialProvider?:any;
-    region?:string;
-    maxRetries?:number;
-    maxRedirects?:number;
-    sslEnabled?:boolean;
-    paramValidation?:any;
-    convertResponseTypes?:boolean;
-    correctClockSkew?:boolean;
-    httpOptions?: {
-      proxy?:string;
-      agent?:any;
-      timeout?:number;
-    };
   }
 
   interface PutRecordParams {
@@ -142,6 +169,58 @@ declare namespace Kinesis {
   }
 }
 
+declare namespace S3 {
+  interface Options extends ServiceOptions {
+    params?: {
+      Bucket?:string;
+    }
+  }
+
+  interface Params {
+    SSECustomerAlgorithm?: string;
+    SSECustomerKey?: Buffer | string;
+    SSECustomerKeyMD5?: string;
+    RequestPayer?: 'requester';
+  }
+
+  interface Response {
+    SSECustomerAlgorithm?: string;
+    SSECustomerKeyMD5?: string;
+    SSEKMSKeyId?: string;
+    RequestCharged?: string;
+  }
+
+  interface PutObjectParams extends Params {
+    Bucket?: string;
+    Key?: string;
+    ACL?: 'private' | 'public-read' | 'public-read-write' | 'authenticated-read' | 'aws-exec-read' | 'bucket-owner-read' | 'bucker-owner-full-control';
+    Body: Buffer | string | {read:any, length:number};
+    CacheControl?: string;
+    ContentDisposition?: string;
+    ContentEncoding?: string;
+    ContentLanguage?: string;
+    ContentLength?: number;
+    ContentMD5?: string;
+    ContentType?: string;
+    Expires?: Date | string | number;
+    GrantFullControl?: string;
+    GrantRead?: string;
+    GrantReadACP?: string;
+    GrantWriteACP?: string;
+    Metadata?: {[index:string]:string};
+    ServerSideEncryption?: 'AES256' | 'aws:kms';
+    StorageClass?: 'STANDARD' | 'REDUCED_REDUNDANCY' | 'STANDARD_IA';
+    WebsiteRedirectLocation?: string;
+  }
+
+  interface PutObjectResponse extends Response {
+    Expiration: string;
+    ETag: string;
+    ServerSideEncryption?: 'AES256' | 'aws:kms';
+    VersionId?: string;
+  }
+}
+
 declare module 'aws-sdk' {
   type Callback<T> = (err: any, data: T) => void;
 
@@ -169,5 +248,11 @@ declare module 'aws-sdk' {
 
     getShardIterator(params: Kinesis.GetShardIteratorParams,
                      callback?: Callback<Kinesis.GetShardIteratorResponse>): Response<Kinesis.GetShardIteratorResponse>
+  }
+
+  export class S3 {
+    constructor(options?: S3.Options);
+
+    putObject(params: S3.PutObjectParams, callback?: Callback<S3.PutObjectResponse>): Response<S3.PutObjectResponse>;
   }
 }

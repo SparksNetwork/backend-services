@@ -1,14 +1,24 @@
 import {test} from 'ava';
-import {StreamTransform} from "../lib/StreamTransform";
+import {StreamTransform} from "./StreamTransform";
 import {SinonStub} from "sinon";
 const AWS = require('aws-sdk-mock');
 
-const inputRecord:Kinesis.Record = {
-  SequenceNumber: "0001",
-  PartitionKey: "acb123",
-  Data: new Buffer(JSON.stringify({
-    test: "data"
-  }))
+const inputEvent:Lambda.KinesisEvent = {
+  Records: [{
+    awsRegion: 'us-west-2',
+    eventName: 'aws:kinesis:record',
+    eventSource: 'aws:kinesis',
+    eventSourceARN: 'arn:aws:test',
+    eventVersion: '1.0.0',
+    invokeIdentityArn: 'arn:aws:test',
+    eventID: '0001',
+    kinesis: {
+      sequenceNumber: '0001',
+      partitionKey: 'abc123',
+      kinesisSchemaVersion: '1.0.0',
+      data: new Buffer(JSON.stringify({test: 'data'})).toString('base64')
+    }
+  }]
 };
 
 test.afterEach(() => AWS.restore());
@@ -23,7 +33,7 @@ test.serial('single record', async function(t) {
   });
 
   const putRecords = AWS.mock("Kinesis", "putRecords");
-  await func(inputRecord);
+  await func(inputEvent);
 
   const stub:SinonStub = putRecords.stub;
   t.is(stub.callCount, 1);
@@ -58,7 +68,7 @@ test.serial('multiple records', async function(t) {
   });
 
   const putRecords = AWS.mock("Kinesis", "putRecords");
-  await func(inputRecord);
+  await func(inputEvent);
 
   const stub:SinonStub = putRecords.stub;
   t.is(stub.callCount, 1);
@@ -99,7 +109,7 @@ test.serial('multiple records to multiple streams', async function(t) {
   });
 
   const putRecords = AWS.mock("Kinesis", "putRecords");
-  await func(inputRecord);
+  await func(inputEvent);
 
   const stub:SinonStub = putRecords.stub;
   t.is(stub.callCount, 2);
@@ -135,6 +145,6 @@ test.serial('error in transform function', async function(t) {
   })
 
   const putRecords = AWS.mock("Kinesis", "putRecords");
-  t.throws(func(inputRecord), "An error");
+  t.throws(func(inputEvent), "An error");
   t.falsy(putRecords.stub);
 });

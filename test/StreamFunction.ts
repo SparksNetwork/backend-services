@@ -1,8 +1,27 @@
 import {apex} from "./apex";
+import KinesisEvent = Lambda.KinesisEvent;
 
-function makeRecord(message) {
+function makeEvent(message):KinesisEvent {
+  const record:Lambda.KinesisEventRecord = {
+    awsRegion: 'us-west-2',
+    eventName: 'aws:kinesis:record',
+    eventSource: 'aws:kinesis',
+    eventSourceARN: 'arn:aws:test',
+    eventVersion: '1.0.0',
+    invokeIdentityArn: 'arn:aws:test',
+    eventID: '001',
+    kinesis: {
+      sequenceNumber: '0001',
+      partitionKey: 'abc123',
+      kinesisSchemaVersion: '1.0.0',
+      data: new Buffer(JSON.stringify(message)).toString('base64')
+    }
+  };
+
+  const Records = [record];
+
   return {
-    Data: new Buffer(JSON.stringify(message))
+    Records
   }
 }
 
@@ -21,5 +40,5 @@ function makeRecord(message) {
  * @constructor
  */
 export async function StreamFunction(message:Object, service:Function) {
-  return await apex(service, makeRecord(message));
+  return await apex(service, makeEvent(message));
 }

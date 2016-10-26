@@ -1,4 +1,4 @@
-data "terraform_remote_state" "terraform" {
+data "terraform_remote_state" "main" {
   backend = "s3"
   config {
     bucket = "terraform.sparks.network"

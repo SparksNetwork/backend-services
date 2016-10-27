@@ -118,9 +118,10 @@ function sourceMapSupport(fn:ApexFunction) {
             line: mappingItem.originalLine,
             column: mappingItem.originalColumn
           }) : null;
+          let newMapping;
 
           if (originalMapping && originalMapping.source) {
-            gen.addMapping({
+            newMapping = {
               name: originalMapping.name,
               source: originalMapping.source,
               generated: {
@@ -131,9 +132,9 @@ function sourceMapSupport(fn:ApexFunction) {
                 line: originalMapping.line,
                 column: originalMapping.column
               }
-            });
+            };
           } else {
-            gen.addMapping({
+            newMapping = {
               name: mappingItem.name,
               source: mappingItem.source,
               generated: {
@@ -144,7 +145,11 @@ function sourceMapSupport(fn:ApexFunction) {
                 line: mappingItem.originalLine,
                 column: mappingItem.originalColumn
               }
-            });
+            };
+          }
+
+          if (newMapping.original.line) {
+            gen.addMapping(newMapping);
           }
         });
 

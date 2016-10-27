@@ -46,7 +46,10 @@ const invalidRemoveMessage = {
 };
 
 const db = new MockFirebase();
-establishConnection('firebase-service', db);
+
+test.beforeEach(() => {
+  establishConnection('firebase-service', db);
+});
 
 test.serial('create message', async function(t) {
   const m = mock(db.database().ref().child('Arrivals').child('abc123'));

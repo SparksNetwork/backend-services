@@ -21,7 +21,10 @@ const customerMock = mock(braintree.customer);
 test.afterEach(() => customerMock.restore());
 
 const db = new MockFirebase();
-establishConnection('gatewayCustomer', db);
+
+test.beforeEach(() => {
+  establishConnection('gatewayCustomer', db);
+});
 test.afterEach(() => db.reset());
 
 test.serial('profile is created creates a gateway customer in braintree', async function(t) {

@@ -1,15 +1,14 @@
-import * as apex from 'apex.js';
 import {EngagementsCreateCommand} from 'sparks-schemas/types/commands/EngagementsCreate';
 import {StreamTransform} from "../../lib/StreamTransform";
-import {spread} from "../../lib/spread";
 import {lookup} from "../../lib/ExternalFactories/Firebase";
 import {BraintreeGateway} from "../../lib/ExternalFactories/Braintree";
 import {dataUpdate} from "../../helpers/dataUpdate";
+import {λ} from "../../lib/lambda";
 
 const generatePaymentToken = StreamTransform('command.Engagements.create', async function({domain, uid, payload: {values}}:EngagementsCreateCommand) {
 
   const key = [values.oppKey, values.profileKey].join('-');
-  const customerId = await lookup('engagementsPayment', 'GatewayCustomers', values.profileKey, 'gatewayId');
+  const customerId = await lookup('GatewayCustomers', values.profileKey, 'gatewayId');
 
   if (!customerId) {
     throw new Error('Cannot find gateway id');
@@ -30,5 +29,5 @@ const generatePaymentToken = StreamTransform('command.Engagements.create', async
   })];
 });
 
-export default apex(spread(generatePaymentToken));
+export default λ('engagementsPaymentToken', generatePaymentToken);
 

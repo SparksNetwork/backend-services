@@ -2,6 +2,12 @@
 
 mkdir -p dist
 
+if [ -n "$1" ]; then
+    echo "[BUILD] apex"
+    apex build $1 > dist/$1.zip
+    exit
+fi
+
 FUNCS=$(ls functions)
 MFUNCS=()
 

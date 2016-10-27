@@ -1,4 +1,3 @@
-import * as assert from 'assert';
 import * as apex from 'apex.js';
 import {StreamTransform} from "../../lib/StreamTransform";
 import {data} from 'sparks-schemas/generators/data';
@@ -7,7 +6,7 @@ import {dataCreate} from "../../helpers/dataCreate";
 import {dataRemove} from "../../helpers/dataRemove";
 import {spread} from "../../lib/spread";
 
-const engUpdate = data('Engagements.update')
+const engUpdate = data('Engagements.update');
 
 function pred(p) {
   return both(

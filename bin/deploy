@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ ! -n "$1" ]; then
+    echo "Usage bin/deploy <service>"
+    exit 1
+fi
+
+bin/build $1
+bin/plan -refresh=false -target=aws_lambda_function.$1
+bin/apply

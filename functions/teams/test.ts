@@ -43,10 +43,11 @@ const removeCommand:TeamsRemoveCommand = {
 };
 
 const db = new MockFirebase();
-establishConnection('teams', db);
 
 test.afterEach(() => db.reset());
 test.beforeEach(() => {
+  establishConnection('teams', db);
+
   db.database().ref()
     .child('Users')
     .child('abc123')

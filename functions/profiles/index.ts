@@ -1,17 +1,16 @@
-import * as apex from 'apex.js';
 import {StreamTransform} from "../../lib/StreamTransform";
 import {
   ProfilesCreateCommand,
 } from 'sparks-schemas/types/commands/ProfilesCreate';
 import {ProfilesUpdateCommand} from 'sparks-schemas/types/commands/ProfilesUpdate';
 import {search} from "../../lib/ExternalFactories/Firebase";
-import {spread} from "../../lib/spread";
 import {merge} from 'ramda'
 import {dataCreate} from "../../helpers/dataCreate";
 import {dataUpdate} from "../../helpers/dataUpdate";
+import {λ} from "../../lib/lambda";
 
 const create = StreamTransform<ProfilesCreateCommand,any>('command.Profiles.create', async function ({uid, payload: {values}}: ProfilesCreateCommand) {
-  const matchingProfiles = await search('profiles', ['uid', uid], 'Profiles');
+  const matchingProfiles = await search(['uid', uid], 'Profiles');
   const profileKeys = Object.keys(matchingProfiles);
 
   if (profileKeys.length > 0) {
@@ -34,4 +33,4 @@ const update = StreamTransform('command.Profiles.update', async function ({uid, 
   return [dataUpdate('Profiles', key, uid, values)];
 });
 
-export default apex(spread(create, update));
+export default λ('profiles', create, update);

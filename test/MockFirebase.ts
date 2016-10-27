@@ -121,6 +121,7 @@ export class MockDatabase {
  */
 export class MockFirebase {
   private _database:MockDatabase;
+  private _deleted:boolean = false;
 
   constructor() {
     this.reset();
@@ -132,5 +133,10 @@ export class MockFirebase {
 
   database() {
     return this._database;
+  }
+
+  delete() {
+    this._deleted = true;
+    return Promise.resolve(true);
   }
 }

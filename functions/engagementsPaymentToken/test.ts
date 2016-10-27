@@ -18,7 +18,11 @@ const clientTokenMock = mock(braintree.clientToken);
 test.afterEach(() => clientTokenMock.restore());
 
 const db = new MockFirebase();
-establishConnection('engagementsPayment', db);
+
+test.beforeEach(() => {
+  establishConnection('engagementsPayment', db);
+});
+
 test.afterEach(() => db.reset());
 
 test.serial('generate payment token on creation', async function(t) {

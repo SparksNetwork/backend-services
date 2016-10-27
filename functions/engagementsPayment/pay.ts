@@ -12,8 +12,6 @@ import {
 } from "../../typings/braintree";
 import {dataUpdate} from "../../helpers/dataUpdate";
 
-const service = 'engagementsPayment';
-
 function createSubscription(options):Promise<Subscription> {
   const gateway = BraintreeGateway();
 
@@ -28,11 +26,11 @@ function createSubscription(options):Promise<Subscription> {
 }
 
 export const pay = StreamTransform('command.Engagements.pay', async function ({domain, uid, payload: {key, values: {paymentNonce}}}:EngagementsPayCommand) {
-  const engagement: Engagement = await lookup(service, 'Engagements', key);
+  const engagement: Engagement = await lookup('Engagements', key);
   if (!engagement) {
     throw new Error('Engagement not found');
   }
-  const commitments = await search(service, ['oppKey', engagement.oppKey], 'Commitments');
+  const commitments = await search(['oppKey', engagement.oppKey], 'Commitments');
   const payable = oppPayment(values(commitments));
 
   if (payable.payable === 0) {

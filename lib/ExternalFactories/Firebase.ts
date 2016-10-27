@@ -1,7 +1,27 @@
-import * as firebase from 'firebase';
+import * as fb from 'firebase';
 import * as fs from 'fs';
 
-const connections = {};
+let connection;
+
+class NoConnectionError extends Error {
+  constructor() {
+    super('No firebase connection has been established.');
+  }
+}
+
+export function firebase(serviceName:string, fn:(...args:any[]) => Promise<any>) {
+  return async function(...givenArgs:any[]):Promise<any> {
+    establishConnection(serviceName);
+    givenArgs.push(getConnection());
+
+    try {
+      return await fn(...givenArgs);
+    } finally {
+      await getConnection().delete();
+      connection = null;
+    }
+  }
+}
 
 /**
  * This function returns a Firebase app. If the app has been previously
@@ -24,15 +44,15 @@ const connections = {};
  * @param cn
  * @returns {any}
  */
-export function establishConnection(name:string, cn?:any) {
-  if (cn) { connections[name] = cn; }
-  if (connections[name]) { return connections[name]; }
+export function establishConnection(name:string, cn?:any):firebase.app.App {
+  if (cn) { connection = cn; }
+  if (connection) { return connection; }
 
   const credentials = JSON.parse(fs.readFileSync('credentials.json') as any);
   const project = credentials['project_id'];
   const url = `https://${project}.firebaseio.com`;
 
-  const app = firebase.initializeApp({
+  const app = fb.initializeApp({
     databaseURL: url,
     serviceAccount: 'credentials.json',
     databaseAuthVariableOverride: {
@@ -40,8 +60,16 @@ export function establishConnection(name:string, cn?:any) {
     }
   }, name);
 
-  connections[name] = app;
+  connection = app;
   return app;
+}
+
+function getConnection():firebase.app.App {
+  if (!connection) {
+    throw new NoConnectionError();
+  }
+
+  return connection;
 }
 
 /**
@@ -50,14 +78,13 @@ export function establishConnection(name:string, cn?:any) {
  * @example
  *
  *   // Get the profile at key abc123
- *   const profile = ref('profile-service', 'Profiles', 'abc123');
+ *   const profile = ref('Profiles', 'abc123');
  *   profile.once('value').then(s => s.val());
  *
- * @param app The firebase app or app name
  * @param path The path to the ref wanted
  */
-export function ref(app, ...path:string[]) {
-  const root = (typeof app === 'string' ? establishConnection(app) : app)
+export function ref(...path:string[]) {
+  const root = getConnection()
     .database()
     .ref();
 
@@ -72,20 +99,21 @@ export function ref(app, ...path:string[]) {
  *
  * @example Search for profiles by uid:
  *
- *   const profiles = await search('profile-service', ['uid', uidToFind], 'Profiles');
+ *   const profiles = await search(['uid', uidToFind], 'Profiles');
  *
- * @param app The app name or connection
  * @param key The key to search on
  * @param value The value to search for
  * @param path The path to the records parent
  * @returns {Promise<TResult>}
  */
-export function search(app, [key, value]:[string, any], ...path:string[]):Promise<any> {
-  return ref(app, ...path)
-    .orderByChild(key)
-    .equalTo(value)
-    .once('value')
-    .then(s => s.val());
+export function search([key, value]:[string, any], ...path:string[]):Promise<{}> {
+  return Promise.resolve(
+    ref(...path)
+      .orderByChild(key)
+      .equalTo(value)
+      .once('value')
+      .then(s => s.val() || {})
+  );
 }
 
 /**
@@ -93,16 +121,17 @@ export function search(app, [key, value]:[string, any], ...path:string[]):Promis
  *
  * @example Look up a profile:
  *
- *   const profile = await lookup('profile-service', Profiles, 'abc123');
+ *   const profile = await lookup(Profiles, 'abc123');
  *
- * @param app The app name or connection
  * @param path The path to the record
  * @returns {Promise<any>}
  */
-export function lookup(app, ...path:string[]):Promise<any> {
-  return ref(app, ...path)
+export function lookup(...path:string[]):Promise<any> {
+  return Promise.resolve(
+    ref(...path)
     .once('value')
     .then(s => s.val())
+  );
 }
 
 // Modeled after base64 web-safe chars, but ordered by ASCII.

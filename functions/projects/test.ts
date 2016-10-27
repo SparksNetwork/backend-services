@@ -40,8 +40,13 @@ const removeMessage:ProjectsRemoveCommand = {
 };
 
 const db = new MockFirebase();
-establishConnection('projects', db);
-db.database().ref().child('Users').child('abc123').set('ghj123');
+
+test.beforeEach(() => {
+  establishConnection('projects', db);
+  db.database().ref().child('Users').child('abc123').set('ghj123');
+});
+
+test.afterEach(() => { db.reset(); });
 
 test.serial('create', async function(t) {
   const [dataMessage] = await StreamTransform(createMessage, service);

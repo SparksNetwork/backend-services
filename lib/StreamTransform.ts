@@ -27,6 +27,6 @@ export function StreamTransform<T,U>(schema, transform:Transform<T,U>) {
       throw new Error('StreamTransform expects the function to return the promise of an Array of StreamRecord objects');
     }
 
-    return await StreamPublish(records);
+    return StreamPublish(records);
   });
 }

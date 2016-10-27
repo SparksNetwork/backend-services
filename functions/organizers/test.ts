@@ -42,9 +42,14 @@ const removeCommand:OrganizersRemoveCommand = {
 };
 
 const db = new MockFirebase();
-establishConnection('organizers', db);
-db.database().ref().child('Users').child('abc123').set('jbb392');
-db.database().ref().child('Projects').child('proj123').child('name').set('Project 1');
+
+test.beforeEach(() => {
+  establishConnection('organizers', db);
+  db.database().ref().child('Users').child('abc123').set('jbb392');
+  db.database().ref().child('Projects').child('proj123').child('name').set('Project 1');
+});
+
+test.afterEach(() => { db.reset(); })
 
 test.serial('create', async function(t) {
   const messages = await StreamTransform(createCommand, service);

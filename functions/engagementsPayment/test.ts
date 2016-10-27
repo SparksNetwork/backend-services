@@ -25,7 +25,11 @@ test.beforeEach(() => { subscriptionMock = mock(braintree.subscription) });
 test.afterEach(() => subscriptionMock.restore());
 
 const db = new MockFirebase();
-establishConnection('engagementsPayment', db);
+
+test.beforeEach(() => {
+  establishConnection('engagementsPayment', db);
+});
+
 test.afterEach(() => db.reset());
 
 test.beforeEach(() => {

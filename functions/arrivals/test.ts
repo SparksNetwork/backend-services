@@ -11,7 +11,9 @@ const db = new MockFirebase();
 const userRef = db.database().child('Users').child('abc123');
 userRef.set('tyu678');
 
-establishConnection('arrivals', db);
+test.beforeEach(() => {
+  establishConnection('arrivals', db);
+});
 
 test.serial('create', async function(t) {
   const now = spy(Date, 'now');

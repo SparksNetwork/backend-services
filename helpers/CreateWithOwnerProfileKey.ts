@@ -7,9 +7,9 @@ import {TransformFunction} from "./CommandToDataTransform";
  * Helper, this is a replacement for CreateTransform that adds the profile key
  * of the current user as the ownerProfileKey.
  */
-export function CreateWithOwnerProfileKey(service:string, schemaName:string, transform?:TransformFunction) {
+export function CreateWithOwnerProfileKey(schemaName:string, transform?:TransformFunction) {
   return StreamTransform(schemaName, async function ({domain, action, uid, payload: {values}}) {
-    const ownerProfileKey = await lookup(service, 'Users', uid);
+    const ownerProfileKey = await lookup('Users', uid);
 
     return (transform||identity)([
       {

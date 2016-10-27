@@ -1,5 +1,3 @@
-import * as apex from 'apex.js';
-import {spread} from "../../lib/spread";
 import {CreateWithOwnerProfileKey} from "../../helpers/CreateWithOwnerProfileKey";
 import {
   UpdateTransform,
@@ -7,6 +5,7 @@ import {
 } from "../../helpers/CommandToDataTransform";
 import {lensPath, set, view} from 'ramda';
 import {lookup} from "../../lib/ExternalFactories/Firebase";
+import {λ} from "../../lib/lambda";
 
 const partitionKey = lensPath(['partitionKey']);
 const projectKeyPath = lensPath(['data', 'values', 'projectKey']);
@@ -23,12 +22,12 @@ function valuesProjectPartitionKey([message]:any[]):any[] {
  * Change the partition key to the project key using the value from firebase
  */
 async function lookupProjectPartitionKey([message]:any[]):Promise<any[]> {
-  const projectKey = await lookup('teams', 'Teams', view(teamKeyPath, message) as string, 'projectKey');
+  const projectKey = await lookup('Teams', view(teamKeyPath, message) as string, 'projectKey');
   return [set(partitionKey, projectKey, message)];
 }
 
-export default apex(spread(
-  CreateWithOwnerProfileKey('teams', 'command.Teams.create', valuesProjectPartitionKey),
+export default λ('teams',
+  CreateWithOwnerProfileKey('command.Teams.create', valuesProjectPartitionKey),
   UpdateTransform('command.Teams.update', lookupProjectPartitionKey),
   RemoveTransform('command.Teams.remove', lookupProjectPartitionKey)
-));
+);

@@ -40,7 +40,7 @@ function putRecords(kinesis:Kinesis, streamName:string, records:StreamRecord<any
           PartitionKey: record.partitionKey,
           Data: new Buffer(JSON.stringify(record.data))
         }))
-      }).promise()
+      }).promise();
     })
   );
 }
@@ -54,6 +54,8 @@ function putRecords(kinesis:Kinesis, streamName:string, records:StreamRecord<any
  * @constructor
  */
 export function StreamPublish(records:StreamRecord<any>[]):Promise<any> {
+  console.log('publish to kinesis', {records: records.length});
+
   const agent = new https.Agent({
     rejectUnauthorized: false
   } as any);

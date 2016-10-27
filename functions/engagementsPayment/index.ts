@@ -1,9 +1,8 @@
-import * as apex from 'apex.js';
+import {λ} from "../../lib/lambda";
 import {pay} from "./pay";
-import {spread} from "../../lib/spread";
 import {confirm} from "./confirm";
 
-export default apex(spread(
+export default λ('engagementsPayment',
   pay,
   confirm
-));
+);

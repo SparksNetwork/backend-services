@@ -6,16 +6,14 @@ import {oppPayment} from "../../lib/domain/Opp";
 import {values} from 'ramda';
 import {dataUpdate} from "../../helpers/dataUpdate";
 
-const service = 'engagementsPayment';
-
 export const confirm = StreamTransform('command.Engagements.confirm', async function({domain, uid, payload: {key}}:EngagementsConfirmCommand) {
 
-  const engagement:Engagement = await lookup(service, 'Engagements', key);
+  const engagement:Engagement = await lookup('Engagements', key);
   if (!engagement) {
     throw new Error('Engagement not found');
   }
 
-  const commitments = await search(service, ['oppKey', engagement.oppKey], 'Commitments');
+  const commitments = await search(['oppKey', engagement.oppKey], 'Commitments');
   const payable = oppPayment(values(commitments));
 
   if (payable.payable > 0) {

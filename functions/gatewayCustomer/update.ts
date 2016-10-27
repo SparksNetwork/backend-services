@@ -15,7 +15,7 @@ const makeCustomerOptions:(profile:Profile) => CustomerOptions = applySpec({
 });
 
 export const profileUpdate = StreamFunction(data('Profiles.update'), async function(message:UpdateData<Profile>) {
-  const gatewayId = await lookup('gatewayCustomer', 'GatewayCustomers', message.key, 'gatewayId');
+  const gatewayId = await lookup('GatewayCustomers', message.key, 'gatewayId');
   // If the gateway id is not found then it might be due to message ordering
   if (!gatewayId) { throw new Error('Could not find gateway customer'); }
 

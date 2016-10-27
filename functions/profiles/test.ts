@@ -7,7 +7,10 @@ import {MockFirebase} from "../../test/MockFirebase";
 import {establishConnection} from "../../lib/ExternalFactories/Firebase";
 
 const db = new MockFirebase();
-establishConnection('profiles', db);
+
+test.beforeEach(() => {
+  establishConnection('profiles', db);
+});
 
 test.serial('create for new user', async function(t) {
   const payload:ProfilesCreatePayload = {

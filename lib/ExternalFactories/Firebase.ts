@@ -1,4 +1,5 @@
 import * as firebase from 'firebase';
+import * as fs from 'fs';
 
 const connections = {};
 
@@ -27,8 +28,12 @@ export function establishConnection(name:string, cn?:any) {
   if (cn) { connections[name] = cn; }
   if (connections[name]) { return connections[name]; }
 
+  const credentials = JSON.parse(fs.readFileSync('credentials.json') as any);
+  const project = credentials['project_id'];
+  const url = `https://${project}.firebaseio.com`;
+
   const app = firebase.initializeApp({
-    databaseURL: process.env["FIREBASE_DATABASE_URL"],
+    databaseURL: url,
     serviceAccount: 'credentials.json',
     databaseAuthVariableOverride: {
       uid: name

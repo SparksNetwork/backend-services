@@ -7,11 +7,15 @@ import async = require("async");
 import {exec} from "child_process";
 import {writeFile} from "fs";
 import {readFile} from "fs";
-import {readJsonFile, execJson, tryParse} from "./lib/json";
+import {readJsonFile, execJson} from "./lib/json";
 import {SourceMapConsumer, SourceMapGenerator} from 'source-map';
 import Mapping = SourceMap.Mapping;
 import GetObjectResponse = S3.GetObjectResponse;
 import {unlink} from "fs";
+import * as glob from 'glob';
+import * as clc from 'cli-color';
+import * as Throbber from 'cli-color/throbber';
+
 const path = process.argv[2];
 
 if (!path || path === '') {
@@ -21,28 +25,44 @@ if (!path || path === '') {
 
 const name:string = path.split('/').slice(-1)[0];
 
-function output(name:string, cb:(err:Error) => void) {
-  console.log(`[${name}] start`);
-  return function(err, stdout, stderr) {
-    if (stdout && stdout.length > 0) {
-      console.log(`[${name}]`, stdout);
-    }
-    if (stderr && stderr.length > 0) {
-      console.log(`[${name}] ERR`, stderr);
-    }
-    console.log(`[${name}] done`);
-    cb(err);
+function asyncTime(name, fn) {
+  const grey = clc.xterm(252);
+  return function(...args) {
+    const start = Date.now();
+    process.stdout.write(grey('[', name, '] '));
+
+    const throbber = Throbber(str => {
+      process.stdout.write(str);
+    }, 200);
+    throbber.start();
+
+    const cb = args.slice(-1)[0];
+    const newcb = function(err, ...cbargs) {
+      throbber.stop();
+      process.stdout.write(clc.erase.line);
+      process.stdout.write(clc.move.left(clc.windowSize.width));
+
+      if (err) {
+        process.stdout.write(clc.red('[', name, '] error: ', err));
+      } else {
+        const time = Date.now() - start;
+        process.stdout.write(clc.green('[', name, '] done ') + clc.cyan(time, 'ms'));
+      }
+
+      process.stdout.write("\n");
+      cb(err, ...cbargs);
+    };
+    args.splice(-1, 1, newcb);
+    fn.apply(this, args);
   }
 }
 
 function tsc(fn:ApexFunction) {
   return function(cb) {
-    console.log('[tsc] start');
     exists(join(fn.path, 'index.js'), function(tsExists) {
       if (!tsExists) {
-        exec('node_modules/.bin/tsc', output('tsc', cb));
+        exec('node_modules/.bin/tsc', cb);
       } else {
-        console.log('[tsc] not required');
         cb(null);
       }
     });
@@ -50,8 +70,7 @@ function tsc(fn:ApexFunction) {
 }
 
 function sourceMapSupport(fn) {
-  return function(b, cb) {
-    console.log('[source-map-support] start');
+  return function(cb) {
     async.auto({
       writeSms: function (cb) {
         writeFile(`${fn.path}/sms.js`, `require('source-map-support').install();\n`, cb)
@@ -59,11 +78,16 @@ function sourceMapSupport(fn) {
       main: function (cb) {
         readFile(join(fn.path, 'main.js'), cb)
       },
-      rawMap: function (cb) {
-        readJsonFile(join(fn.path, 'main.js.map'), cb);
-      },
-      index: function (cb) {
-        readFile(join(fn.path, 'index.js'), cb);
+      maps: function(cb) {
+        glob('**/*.map', {ignore: ['node_modules/**/*', `functions/!(${fn.name})/**/*`], nodir: true}, function(err, files) {
+          const tasks = files.reduce(function(acc, file) {
+            const name = file.split('.').slice(0,-1).join('.');
+            acc[name] = async.apply(readJsonFile, file);
+            return acc;
+          }, {});
+
+          async.parallel(tasks, cb);
+        });
       },
       sms: ['writeSms', function (results, cb) {
         const cmd = `browserify --debug --node -s default ${fn.path}/sms.js \
@@ -73,59 +97,81 @@ function sourceMapSupport(fn) {
           cb(err, stdout.toString());
         });
       }],
-      removeSms: ['sms', function(results, cb) {
+      removeSms: ['writeMap', function(results, cb) {
         unlink(join(fn.path, 'sms.js'), cb);
       }],
-      removeSmsMap: ['sms', function(results, cb) {
+      removeSmsMap: ['writeMap', function(results, cb) {
         unlink(join(fn.path, 'sms.js.map'), cb);
       }],
       writeMain: ['sms', 'main', function ({sms, main}, cb) {
         const data = [sms, main.toString()].join("\n");
         writeFile(join(fn.path, 'main.js'), data, cb);
       }],
-      writeMap: ['sms', 'rawMap', 'index', function ({sms, rawMap, index}, cb) {
+      writeMap: ['sms', 'maps', function ({sms, maps}, cb) {
         const lines: number = sms.split("\n").length;
-        const consumer = new SourceMapConsumer(rawMap);
+
+        const consumers = Object.keys(maps).reduce(function(acc, name) {
+          acc[name] = new SourceMapConsumer(maps[name]);
+          return acc;
+        }, {});
+
         const gen = new SourceMapGenerator();
-        gen.setSourceContent('index.js', index.toString());
 
-        consumer.eachMapping(function (mappingItem) {
-          const mapping: Mapping = {
-            name: mappingItem.name,
-            source: mappingItem.source,
-            generated: {
-              line: mappingItem.generatedLine + lines,
-              column: mappingItem.generatedColumn
-            },
-            original: {
-              line: mappingItem.originalLine,
-              column: mappingItem.originalColumn
-            }
-          };
+        consumers[join(fn.path, 'main.js')].eachMapping(function (mappingItem) {
+          const original:SourceMapConsumer = consumers[mappingItem.source];
+          const originalMapping = original ? original.originalPositionFor({
+            line: mappingItem.originalLine,
+            column: mappingItem.originalColumn
+          }) : null;
 
-          gen.addMapping(mapping);
+          if (originalMapping && originalMapping.source) {
+            gen.addMapping({
+              name: originalMapping.name,
+              source: originalMapping.source,
+              generated: {
+                line: mappingItem.generatedLine + lines,
+                column: mappingItem.generatedColumn
+              },
+              original: {
+                line: originalMapping.line,
+                column: originalMapping.column
+              }
+            });
+          } else {
+            gen.addMapping({
+              name: mappingItem.name,
+              source: mappingItem.source,
+              generated: {
+                line: mappingItem.generatedLine + lines,
+                column: mappingItem.generatedColumn
+              },
+              original: {
+                line: mappingItem.originalLine,
+                column: mappingItem.originalColumn
+              }
+            });
+          }
         });
 
         writeFile(join(fn.path, 'main.js.map'), gen.toString(), cb);
       }]
     }, 100, function (err) {
-      console.log('[source-map-support] done');
       cb(err);
     });
   }
 }
 
 function browserify(fn) {
-  return function(tsc, cb) {
+  return function(cb) {
     const cmd = `browserify --debug --node -s default -t babelify ${fn.path}/index.js \
     | exorcist ${fn.path}/main.js.map > ${fn.path}/main.js`;
-    exec(cmd, output('browserify', cb))
+
+    exec(cmd, cb);
   }
 }
 
 function injectFirebaseCredentials(fn) {
   return function(cb) {
-    console.log('[firebase] inject credentials')
     async.waterfall([
       function(cb) {
         const cmd = "cd infrastructure; terraform output -json";
@@ -150,14 +196,17 @@ function injectFirebaseCredentials(fn) {
 getFunction(name, function(err, fn:ApexFunction) {
   if (err) { exitErr(err); }
 
-  async.auto({
-    firebase: injectFirebaseCredentials(fn),
-    tsc: tsc(fn),
-    browserify: ['tsc', browserify(fn)],
-    sourceMapSupport: ['browserify', sourceMapSupport(fn)]
-  }, 100, function(err) {
-    if (err) { exitErr(err); }
+  async.series([
+    asyncTime('firebase', injectFirebaseCredentials(fn)),
+    asyncTime('tsc', tsc(fn)),
+    asyncTime('browserify', browserify(fn)),
+    asyncTime('source-map-support', sourceMapSupport(fn))
+  ], function(err) {
+    if (err) {
+      console.log("\n");
+      console.log('ERROR', err);
+      process.exit(1);
+    }
   });
 });
-
 

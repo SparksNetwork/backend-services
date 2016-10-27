@@ -1,7 +1,7 @@
 "use strict";
-var fs = require("fs");
-var left = 0;
-var variables = [];
+const fs = require('fs');
+let left = 0;
+const variables = [];
 function showOutput() {
     left -= 1;
     if (left !== 0) {
@@ -14,15 +14,15 @@ fs.readdir('functions', function (err, files) {
         throw err;
     }
     left = files.length;
-    files.forEach(function (file) {
-        fs.stat("functions/" + file, function (err, stats) {
+    files.forEach(file => {
+        fs.stat(`functions/${file}`, function (err, stats) {
             if (err) {
                 return showOutput();
             }
             if (!stats.isDirectory()) {
                 return showOutput();
             }
-            variables.push("variable \"apex_function_" + file + "\" {}");
+            variables.push(`variable "apex_function_${file}" {}`);
             showOutput();
         });
     });

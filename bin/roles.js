@@ -1,10 +1,10 @@
 "use strict";
-var apex_1 = require("./lib/apex");
-var util_1 = require("./lib/util");
-var terraform_1 = require("./lib/terraform");
-var fs = require("fs");
-var json_1 = require("./lib/json");
-var async = require("async");
+const apex_1 = require("./lib/apex");
+const util_1 = require("./lib/util");
+const terraform_1 = require("./lib/terraform");
+const fs = require('fs');
+const json_1 = require("./lib/json");
+const async = require("async");
 function generateRole(fn) {
     return terraform_1.resource("aws_iam_role", fn.name, {
         name_prefix: fn.name,
@@ -16,10 +16,10 @@ function generateRole(fn) {
     });
 }
 function generateRolePolicy(fn) {
-    var streamName = fn.config['stream'].replace('.', '_');
+    const streamName = fn.config['stream'].replace('.', '_');
     return terraform_1.resource("aws_iam_role_policy", [fn.name, 'stream'].join('-'), {
         name: streamName,
-        role: "${aws_iam_role." + fn.name + ".id}",
+        role: `\${aws_iam_role.${fn.name}.id}`,
         policy: terraform_1.terraformJson({
             "Version": "2012-10-17",
             "Statement": [
@@ -32,7 +32,7 @@ function generateRolePolicy(fn) {
                     ],
                     "Effect": "Allow",
                     "Resource": [
-                        "${data.terraform_remote_state.main." + streamName + "_arn}"
+                        `\${data.terraform_remote_state.main.${streamName}_arn}`
                     ]
                 }
             ]
@@ -40,17 +40,17 @@ function generateRolePolicy(fn) {
     });
 }
 function generateCustomPolicy(fn, cb) {
-    fs.exists(fn.path + "/policy.json", function (exists) {
+    fs.exists(`${fn.path}/policy.json`, function (exists) {
         if (!exists) {
             return cb(null, '');
         }
-        json_1.readJsonFile(fn.path + "/policy.json", function (err, policy) {
+        json_1.readJsonFile(`${fn.path}/policy.json`, function (err, policy) {
             if (err) {
                 return cb(err, null);
             }
-            cb(null, terraform_1.resource("aws_iam_role_policy", fn.name + "-custom", {
+            cb(null, terraform_1.resource("aws_iam_role_policy", `${fn.name}-custom`, {
                 name: 'custom',
-                role: "${aws_iam_role." + fn.name + ".id}",
+                role: `\${aws_iam_role.${fn.name}.id}`,
                 policy: terraform_1.terraformJson(policy)
             }));
         });
@@ -68,21 +68,21 @@ apex_1.getFunctions(function (err, functions) {
             }
         });
         console.log(customPolicies.join("\n"));
-        var roles = functions.map(function (fn) { return "${aws_iam_role." + fn.name + ".id}"; });
+        const roles = functions.map(fn => `\${aws_iam_role.${fn.name}.id}`);
         console.log(terraform_1.resource("aws_iam_policy_attachment", "logs", {
             name: "logs",
             policy_arn: "${aws_iam_policy.logs.arn}",
-            roles: roles
+            roles
         }));
         console.log(terraform_1.resource("aws_iam_policy_attachment", "write-to-data-firebase", {
             name: "write-to-data-firebase-attachment",
             policy_arn: "${aws_iam_policy.write-to-data-firebase.arn}",
-            roles: roles
+            roles
         }));
         console.log(terraform_1.resource("aws_iam_policy_attachment", "write-to-data-emails", {
             name: "write-to-data-emails-attachment",
             policy_arn: "${aws_iam_policy.write-to-data-emails.arn}",
-            roles: roles
+            roles
         }));
     });
 });

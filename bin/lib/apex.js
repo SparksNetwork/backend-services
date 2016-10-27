@@ -1,24 +1,24 @@
 "use strict";
-var fs = require("fs");
-var async = require("async");
-var json_1 = require("./json");
-var path_1 = require("path");
+const fs = require('fs');
+const async = require('async');
+const json_1 = require("./json");
+const path_1 = require("path");
 function apexDefaults(cb) {
     json_1.readJsonFile('project.json', cb);
 }
 exports.apexDefaults = apexDefaults;
 function getFunction(name, cb) {
-    var path = "functions/" + name;
+    const path = `functions/${name}`;
     fs.exists(path, function (exists) {
         if (!exists) {
-            return cb(new Error("Function " + name + " does not exist"), null);
+            return cb(new Error(`Function ${name} does not exist`), null);
         }
-        var fn = {
-            path: path,
-            name: name,
+        const fn = {
+            path,
+            name,
             config: {}
         };
-        var configPath = path_1.join(path, 'function.json');
+        const configPath = path_1.join(path, 'function.json');
         fs.exists(configPath, function (exists) {
             if (exists) {
                 json_1.readJsonFile(configPath, function (err, object) {

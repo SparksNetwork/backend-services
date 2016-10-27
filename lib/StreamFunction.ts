@@ -4,7 +4,10 @@ import Record = Kinesis.Record;
 import ValidateFunction = ajv.ValidateFunction;
 import KinesisEventRecord = Lambda.KinesisEventRecord;
 
-type SchemaFunction = (message:any) => boolean | Promise<boolean>;
+interface SchemaFunction {
+  (message:any): boolean;
+  errors?: Array<any>
+}
 type ValidationOption = ValidateFunction | SchemaFunction | string | null;
 type ValidationArg = ValidationOption | Promise<ValidationOption>;
 
@@ -24,20 +27,28 @@ async function createValidationFunction(fromp:ValidationArg):Promise<SchemaFunct
   return from as any;
 }
 
-function executeFnIfSchema<T>(fn:(message:T) => Promise<any>, schemaFn:(message) => Promise<boolean> | boolean) {
-  return async function(record:Lambda.KinesisRecord) {
-    const data = new Buffer(record.data, 'base64');
-    const message = JSON.parse(data as any) as T;
-    const valid = await Promise.resolve(schemaFn(message));
-
-    if(valid) {
-      return await fn(message);
-    }
-  }
+function recordToMessage(record:Lambda.KinesisEventRecord) {
+  const kinesis = record.kinesis;
+  const data = new Buffer(kinesis.data, 'base64');
+  const message = JSON.parse(data as any)
+  return message;
 }
 
-function unwrapEvent(e:KinesisEventRecord) {
-  return e.kinesis;
+function showInvalidReason(domainAction:string, schemaFn:SchemaFunction, messages:any[]) {
+  const [stream, domain, action] = domainAction.split('.');
+
+  messages.forEach(message => {
+    if (!message.domain || !message.action) { return; }
+    if (message.domain !== domain || message.action !== action) { return; }
+
+    console.log(domainAction, 'message did not pass validation');
+    schemaFn(message);
+    if (schemaFn.errors) {
+      console.log('Errors')
+      console.log(schemaFn.errors);
+    }
+    console.log(message);
+  });
 }
 
 /**
@@ -60,13 +71,24 @@ export function StreamFunction<T>(schema: ValidationArg, fn:(message:T) => Promi
   const schemaPromise = createValidationFunction(schema);
 
   return async function(e:Lambda.KinesisEvent) {
+    console.log({
+      sequenceNumbers: e.Records.map(record => record.kinesis.sequenceNumber)
+    });
+
     const schemaFn = await schemaPromise;
 
     if (typeof schemaFn !== 'function') {
       throw new Error('Schema ' + schema + ' not found!');
     }
 
-    const executeFn = executeFnIfSchema(fn, schemaFn);
-    return Promise.all(e.Records.map(unwrapEvent).map(executeFn));
+    const messages = e.Records.map(recordToMessage);
+    const validMessages = messages.filter(schemaFn);
+
+    if (validMessages.length === 0 && typeof schema === 'string') {
+      showInvalidReason(schema, schemaFn, messages);
+    }
+
+    console.log({received: messages.length, valid: validMessages.length});
+    return Promise.all(validMessages.map(message => fn(message)));
   };
 }

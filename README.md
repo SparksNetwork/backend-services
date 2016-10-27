@@ -179,6 +179,10 @@ Changes in bob
 [BUILD] apex
 100% 1:0=0s bob
 -> bin/plan -refresh=false
+Writing roles
+Writing attachments
+Writing functions
+Planning
 -> bin/apply
 ```
 

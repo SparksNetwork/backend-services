@@ -1,6 +1,6 @@
 import {S3} from 'aws-sdk';
-import {getFunction, ApexFunction, writeConfig} from "./lib/apex";
-import {exitErr} from "./lib/util";
+import {getFunction, ApexFunction} from "./lib/apex";
+import {exitErr, asyncTime} from "./lib/util";
 import {exists} from "fs";
 import {join} from "path";
 import async = require("async");
@@ -13,8 +13,6 @@ import Mapping = SourceMap.Mapping;
 import GetObjectResponse = S3.GetObjectResponse;
 import {unlink} from "fs";
 import * as glob from 'glob';
-import * as clc from 'cli-color';
-import * as Throbber from 'cli-color/throbber';
 
 const path = process.argv[2];
 
@@ -25,38 +23,12 @@ if (!path || path === '') {
 
 const name:string = path.split('/').slice(-1)[0];
 
-function asyncTime(name, fn) {
-  const grey = clc.xterm(252);
-  return function(...args) {
-    const start = Date.now();
-    process.stdout.write(grey('[', name, '] '));
-
-    const throbber = Throbber(str => {
-      process.stdout.write(str);
-    }, 200);
-    throbber.start();
-
-    const cb = args.slice(-1)[0];
-    const newcb = function(err, ...cbargs) {
-      throbber.stop();
-      process.stdout.write(clc.erase.line);
-      process.stdout.write(clc.move.left(clc.windowSize.width));
-
-      if (err) {
-        process.stdout.write(clc.red('[', name, '] error: ', err));
-      } else {
-        const time = Date.now() - start;
-        process.stdout.write(clc.green('[', name, '] done ') + clc.cyan(time, 'ms'));
-      }
-
-      process.stdout.write("\n");
-      cb(err, ...cbargs);
-    };
-    args.splice(-1, 1, newcb);
-    fn.apply(this, args);
-  }
-}
-
+/**
+ * Runs tsc, but only if the index.js file does not exist already.
+ *
+ * @param fn
+ * @returns {(cb:any)=>undefined}
+ */
 function tsc(fn:ApexFunction) {
   return function(cb) {
     exists(join(fn.path, 'index.js'), function(tsExists) {
@@ -69,15 +41,32 @@ function tsc(fn:ApexFunction) {
   }
 }
 
-function sourceMapSupport(fn) {
+/**
+ * This function installs the source-map-support library into the lambda function
+ * code. It does this by creating a new bundle that just calls the install
+ * and then prepending that to the main bundle.
+ *
+ * After doing this it rewrites the bundle source map by loading all of the
+ * typescript source maps and looking up the original positions. It also has
+ * to increment the line count to take into account the source-map-support
+ * bundle.
+ *
+ * @param fn
+ * @returns {(cb:any)=>undefined}
+ */
+function sourceMapSupport(fn:ApexFunction) {
   return function(cb) {
     async.auto({
+      // Write the source map support code into a file
       writeSms: function (cb) {
         writeFile(`${fn.path}/sms.js`, `require('source-map-support').install();\n`, cb)
       },
+      // Read the main.js file
       main: function (cb) {
         readFile(join(fn.path, 'main.js'), cb)
       },
+      // Load every map file we can find in the code, excluding node_modules and
+      // the other lambda functions
       maps: function(cb) {
         glob('**/*.map', {ignore: ['node_modules/**/*', `functions/!(${fn.name})/**/*`], nodir: true}, function(err, files) {
           const tasks = files.reduce(function(acc, file) {
@@ -89,6 +78,7 @@ function sourceMapSupport(fn) {
           async.parallel(tasks, cb);
         });
       },
+      // bundle the source map support file
       sms: ['writeSms', function (results, cb) {
         const cmd = `browserify --debug --node -s default ${fn.path}/sms.js \
         | exorcist ${fn.path}/sms.js.map`;
@@ -97,16 +87,21 @@ function sourceMapSupport(fn) {
           cb(err, stdout.toString());
         });
       }],
+      // remove the temporary source map support code
       removeSms: ['writeMap', function(results, cb) {
         unlink(join(fn.path, 'sms.js'), cb);
       }],
+      // remove the source map support map
       removeSmsMap: ['writeMap', function(results, cb) {
         unlink(join(fn.path, 'sms.js.map'), cb);
       }],
+      // Write the new main.js with the prepended source map support bundle
       writeMain: ['sms', 'main', function ({sms, main}, cb) {
         const data = [sms, main.toString()].join("\n");
         writeFile(join(fn.path, 'main.js'), data, cb);
       }],
+      // Taking all the maps, rewrite the main.js.map file using those maps
+      // and add the line count from the source map support bundle.
       writeMap: ['sms', 'maps', function ({sms, maps}, cb) {
         const lines: number = sms.split("\n").length;
 
@@ -153,6 +148,7 @@ function sourceMapSupport(fn) {
           }
         });
 
+        // Finally write the main.js.map file.
         writeFile(join(fn.path, 'main.js.map'), gen.toString(), cb);
       }]
     }, 100, function (err) {
@@ -161,6 +157,12 @@ function sourceMapSupport(fn) {
   }
 }
 
+/**
+ * Execute browserify on the lambda function code
+ *
+ * @param fn
+ * @returns {(cb:any)=>undefined}
+ */
 function browserify(fn) {
   return function(cb) {
     const cmd = `browserify --debug --node -s default -t babelify ${fn.path}/index.js \
@@ -170,6 +172,13 @@ function browserify(fn) {
   }
 }
 
+/**
+ * Download the firebase credentials from s3 and inject them into the lambda
+ * function. Terraform knows where the credentials live.
+ *
+ * @param fn
+ * @returns {(cb:any)=>undefined}
+ */
 function injectFirebaseCredentials(fn) {
   return function(cb) {
     async.waterfall([

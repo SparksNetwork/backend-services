@@ -14,7 +14,7 @@ const makeCustomerOptions:(profile:Profile) => CustomerOptions = applySpec({
   phone: prop('phone')
 });
 
-export const profileCreate = StreamTransform(data('Profiles.create'), async function({key, values: profile}:CreateData<Profile>) {
+export const profileCreate = StreamTransform('data.Profiles.create', async function({key, values: profile}:CreateData<Profile>) {
 
   const customerOptions = makeCustomerOptions(profile);
   const gateway = BraintreeGateway();

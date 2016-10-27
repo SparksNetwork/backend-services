@@ -44,7 +44,14 @@ const removeCommand:TeamsRemoveCommand = {
 
 const db = new MockFirebase();
 establishConnection('teams', db);
-db.database().ref().child('Users').child('abc123').set('edh622');
+
+test.afterEach(() => db.reset());
+test.beforeEach(() => {
+  db.database().ref()
+    .child('Users')
+    .child('abc123')
+    .set('edh622');
+});
 
 test.serial('teams create', async function(t) {
   const [dataMessage] = await StreamTransform(createCommand, service);

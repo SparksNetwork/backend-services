@@ -10,7 +10,7 @@ import {dataCreate} from "../../helpers/dataCreate";
 /**
  * An arrival can only be marked as arrived once
  */
-const create = StreamTransform<ArrivalsCreateCommand, Arrival>('Arrivals.create', async function(message) {
+const create = StreamTransform<ArrivalsCreateCommand, Arrival>('command.Arrivals.create', async function(message) {
   const payload:ArrivalsCreatePayload = message.payload;
   const values = payload.values;
   const key = [values.projectKey, values.profileKey].join('-');
@@ -31,4 +31,4 @@ const create = StreamTransform<ArrivalsCreateCommand, Arrival>('Arrivals.create'
   })];
 });
 
-export default apex(spread(create, RemoveTransform('Arrivals.remove')));
+export default apex(spread(create, RemoveTransform('command.Arrivals.remove')));

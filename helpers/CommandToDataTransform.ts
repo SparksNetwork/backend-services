@@ -62,8 +62,8 @@ export function RemoveTransform(schemaName:string, transform?:TransformFunction)
 
 export function CommandTransform(domain:string) {
   return spread(
-    CreateTransform(domain + '.create'),
-    UpdateTransform(domain + '.update'),
-    RemoveTransform(domain + '.remove')
+    CreateTransform('command.' + domain + '.create'),
+    UpdateTransform('command.' + domain + '.update'),
+    RemoveTransform('command.' + domain + '.remove')
   );
 }

@@ -8,7 +8,7 @@ import {dataUpdate} from "../../helpers/dataUpdate";
 
 const service = 'engagementsPayment';
 
-export const confirm = StreamTransform('Engagements.confirm', async function({domain, uid, payload: {key}}:EngagementsConfirmCommand) {
+export const confirm = StreamTransform('command.Engagements.confirm', async function({domain, uid, payload: {key}}:EngagementsConfirmCommand) {
 
   const engagement:Engagement = await lookup(service, 'Engagements', key);
   if (!engagement) {

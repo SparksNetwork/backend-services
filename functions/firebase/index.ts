@@ -1,27 +1,29 @@
 import * as apex from 'apex.js'
 import {spread} from "../../lib/spread";
-import * as Ajv from 'ajv';
 import {CreateData, UpdateData, RemoveData} from 'sparks-schemas/types/data'
 import {ref} from '../../lib/ExternalFactories/Firebase';
 import {StreamFunction} from "../../lib/StreamFunction";
+import Ajv from 'sparks-schemas/lib/ajv';
 
 const firebaseUid = 'firebase-service';
-const ajv = Ajv();
-ajv.addSchema(require('sparks-schemas/schemas/data/create.json'), 'create');
-ajv.addSchema(require('sparks-schemas/schemas/data/update.json'), 'update');
-ajv.addSchema(require('sparks-schemas/schemas/data/remove.json'), 'remove');
 
-export const create = StreamFunction(ajv.getSchema('create'), async function create(message:CreateData<any>) {
+const ajv = Ajv();
+const schema = ajv.getSchema('data');
+const validateCreate = message => schema(message) && message.action === 'create';
+const validateUpdate = message => schema(message) && message.action === 'update';
+const validateRemove = message => schema(message) && message.action === 'remove';
+
+export const create = StreamFunction(validateCreate, async function create(message: CreateData<any>) {
   const childRef = ref(firebaseUid, message.domain, message.key);
   return await childRef.set(message.values);
 });
 
-export const update = StreamFunction(ajv.getSchema('update'), async function update(message: UpdateData<any>) {
+export const update = StreamFunction(validateUpdate, async function update(message: UpdateData<any>) {
   const childRef = ref(firebaseUid, message.domain, message.key);
   return await childRef.update(message.values);
 });
 
-export const remove = StreamFunction(ajv.getSchema('remove'), async function remove(message: RemoveData) {
+export const remove = StreamFunction(validateRemove, async function remove(message: RemoveData) {
   const childRef = ref(firebaseUid, message.domain, message.key);
   return await childRef.remove();
 });

@@ -10,7 +10,7 @@ import {merge} from 'ramda'
 import {dataCreate} from "../../helpers/dataCreate";
 import {dataUpdate} from "../../helpers/dataUpdate";
 
-const create = StreamTransform<ProfilesCreateCommand,any>('Profiles.create', async function ({uid, payload: {values}}: ProfilesCreateCommand) {
+const create = StreamTransform<ProfilesCreateCommand,any>('command.Profiles.create', async function ({uid, payload: {values}}: ProfilesCreateCommand) {
   const matchingProfiles = await search('profiles', ['uid', uid], 'Profiles');
   const profileKeys = Object.keys(matchingProfiles);
 
@@ -30,7 +30,7 @@ const create = StreamTransform<ProfilesCreateCommand,any>('Profiles.create', asy
   }
 });
 
-const update = StreamTransform('Profiles.update', async function ({uid, payload: {key, values}}: ProfilesUpdateCommand) {
+const update = StreamTransform('command.Profiles.update', async function ({uid, payload: {key, values}}: ProfilesUpdateCommand) {
   return [dataUpdate('Profiles', key, uid, values)];
 });
 

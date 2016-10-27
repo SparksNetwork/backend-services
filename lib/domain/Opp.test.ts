@@ -1,17 +1,13 @@
 import {test} from 'ava';
 import {oppPayment} from './Opp';
-import {
-  PaymentCommitment,
-  DepositCommitment
-} from 'sparks-schemas/types/models/commitment'
 
-const paymentCommitment: PaymentCommitment = {
+const paymentCommitment = {
   amount: 15,
   code: 'payment',
   oppKey: 'opp123'
 };
 
-const depositCommitment: DepositCommitment = {
+const depositCommitment = {
   amount: 175,
   code: 'deposit',
   oppKey: 'opp123'

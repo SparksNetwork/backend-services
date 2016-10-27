@@ -5,12 +5,12 @@ import {StreamTransform} from "../../lib/StreamTransform";
 import {FulfillersCreateCommand} from 'sparks-schemas/types/commands/FulfillersCreate';
 import {dataCreate} from "../../helpers/dataCreate";
 
-const create = StreamTransform('Fulfillers.create', async function({domain, uid, payload: {values}}:FulfillersCreateCommand) {
+const create = StreamTransform('command.Fulfillers.create', async function({domain, uid, payload: {values}}:FulfillersCreateCommand) {
 
   return [dataCreate(domain, [values.oppKey, values.teamKey].join('-'), uid, values)];
 });
 
 export default apex(spread(
   create,
-  RemoveTransform('Fulfillers.remove')
+  RemoveTransform('command.Fulfillers.remove')
 ));

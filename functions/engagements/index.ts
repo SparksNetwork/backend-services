@@ -5,7 +5,7 @@ import {StreamTransform} from "../../lib/StreamTransform";
 import {UpdateTransform} from "../../helpers/CommandToDataTransform";
 import {dataUpdate} from "../../helpers/dataUpdate";
 
-const create = StreamTransform('Engagements.create', async function(
+const create = StreamTransform('command.Engagements.create', async function(
   {domain, uid, payload: {values}}:EngagementsCreateCommand) {
 
   const key = [values.oppKey, values.profileKey].join('-');
@@ -24,5 +24,5 @@ const create = StreamTransform('Engagements.create', async function(
 
 export default apex(spread(
   create,
-  UpdateTransform('Engagements.update')
+  UpdateTransform('command.Engagements.update')
 ));

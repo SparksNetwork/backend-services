@@ -7,13 +7,13 @@ import {StreamTransform} from "../../lib/StreamTransform";
 import {spread} from "../../lib/spread";
 import {dataCreate} from "../../helpers/dataCreate";
 
-const create = StreamTransform('Memberships.create', async function ({domain, uid, payload: {values}}:MembershipsCreateCommand) {
+const create = StreamTransform('command.Memberships.create', async function ({domain, uid, payload: {values}}:MembershipsCreateCommand) {
 
   return [dataCreate(domain, [values.engagementKey, values.teamKey, values.oppKey].join('-'), uid, values)];
 });
 
 export default apex(spread(
   create,
-  UpdateTransform('Memberships.update'),
-  RemoveTransform('Memberships.remove')
+  UpdateTransform('command.Memberships.update'),
+  RemoveTransform('command.Memberships.remove')
 ));

@@ -25,7 +25,7 @@ function updateSubscription(id: string, options: SubscriptionUpdateOptions): Pro
   });
 }
 
-const reclaim = StreamTransform('Engagements.reclaim', async function ({domain, uid, payload: {key}}:EngagementsReclaimCommand) {
+const reclaim = StreamTransform('command.Engagements.reclaim', async function ({domain, uid, payload: {key}}:EngagementsReclaimCommand) {
   const engagement: Engagement = await lookup('engagementsReclaim', 'Engagements', key);
   assert(engagement, 'Engagement not found');
   assert(engagement.payment, 'Engagement not paid');

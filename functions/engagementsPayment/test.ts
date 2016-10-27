@@ -4,12 +4,12 @@ import {test} from 'ava';
 import {EngagementsPayCommand} from 'sparks-schemas/types/commands/EngagementsPay'
 import {EngagementsConfirmCommand} from 'sparks-schemas/types/commands/EngagementsConfirm'
 import {StreamTransform} from "../../test/StreamTransform";
-import {data} from 'sparks-schemas/generators/data';
+import Ajv from 'sparks-schemas/lib/ajv';
 import {BraintreeGateway} from "../../lib/ExternalFactories/Braintree";
 import {MockFirebase} from "../../test/MockFirebase";
 import {establishConnection} from "../../lib/ExternalFactories/Firebase";
 
-const dataUpdate = data('Engagements.update');
+const ajv = Ajv();
 
 const now = spy(Date, 'now');
 test.afterEach(() => now.reset());
@@ -118,8 +118,8 @@ test.serial('paying for an engagement', async function(t) {
   t.is(message.partitionKey, 'abc123');
 
   const {data} = message;
-  const valid = await dataUpdate(data);
-  const errors = (dataUpdate as any).errors as any[];
+  const valid = ajv.validate('data.Engagements.update', data);
+  const errors = ajv.errors;
   t.true(valid, errors && errors.map(e => e.message).join(' '));
 
   t.deepEqual(data.values, {

@@ -13,7 +13,7 @@ import {dataUpdate} from "../../helpers/dataUpdate";
 
 const DOMAIN = process.env['DOMAIN'];
 
-const create = StreamTransform<any,any>('Organizers.create', async function({domain, action, uid, payload: {values}}:OrganizersCreateCommand) {
+const create = StreamTransform<any,any>('command.Organizers.create', async function({domain, action, uid, payload: {values}}:OrganizersCreateCommand) {
 
   const invitedByProfileKey = await lookup('organizers', 'Users', uid);
   const projectName = await lookup('organizers', 'Projects', values.projectKey, 'name');
@@ -49,7 +49,7 @@ const create = StreamTransform<any,any>('Organizers.create', async function({dom
   ]
 });
 
-const accept = StreamTransform('Organizers.accept', async function({domain, uid, payload: {key}}:OrganizersAcceptCommand) {
+const accept = StreamTransform('command.Organizers.accept', async function({domain, uid, payload: {key}}:OrganizersAcceptCommand) {
   const profileKey = await lookup('organizers', 'Users', uid);
 
   return [dataUpdate(domain, key, uid, {
@@ -62,5 +62,5 @@ const accept = StreamTransform('Organizers.accept', async function({domain, uid,
 export default apex(spread(
   create,
   accept,
-  RemoveTransform('Organizers.remove')
+  RemoveTransform('command.Organizers.remove')
 ));

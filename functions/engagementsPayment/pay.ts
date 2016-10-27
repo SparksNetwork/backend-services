@@ -27,7 +27,7 @@ function createSubscription(options):Promise<Subscription> {
   });
 }
 
-export const pay = StreamTransform('Engagements.pay', async function ({domain, uid, payload: {key, values: {paymentNonce}}}:EngagementsPayCommand) {
+export const pay = StreamTransform('command.Engagements.pay', async function ({domain, uid, payload: {key, values: {paymentNonce}}}:EngagementsPayCommand) {
   const engagement: Engagement = await lookup(service, 'Engagements', key);
   if (!engagement) {
     throw new Error('Engagement not found');

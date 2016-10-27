@@ -7,7 +7,7 @@ import {dataUpdate} from "../../helpers/dataUpdate";
 /**
  * Migration command is for whne a user has changed uid
  */
-const migrate = StreamTransform<any,any>('Users.migrate', async function({uid, payload: {toUid, profileKey}}:UsersMigrateCommand) {
+const migrate = StreamTransform<any,any>('command.Users.migrate', async function({uid, payload: {toUid, profileKey}}:UsersMigrateCommand) {
   return [
     dataCreate('Users', toUid, uid, profileKey),
     dataUpdate('Profiles', profileKey, uid, {uid: toUid})

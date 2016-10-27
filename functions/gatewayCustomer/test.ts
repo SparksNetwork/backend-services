@@ -6,6 +6,8 @@ import {StreamFunction} from "../../test/StreamFunction";
 import {BraintreeGateway} from "../../lib/ExternalFactories/Braintree";
 import {MockFirebase} from "../../test/MockFirebase";
 import {establishConnection} from "../../lib/ExternalFactories/Firebase";
+import Ajv from 'sparks-schemas/lib/ajv';
+const ajv = Ajv();
 
 const braintree = {
   customer: {
@@ -30,7 +32,10 @@ test.serial('profile is created creates a gateway customer in braintree', async 
     values: {
       uid: 'abc123',
       fullName: 'Vince Noir',
-      email: 'vince@thezooniverse.org.eu'
+      email: 'vince@thezooniverse.org.eu',
+      isAdmin: false,
+      phone: '+6441234',
+      portraitUrl: 'http://example.com'
     }
   };
 
@@ -40,7 +45,7 @@ test.serial('profile is created creates a gateway customer in braintree', async 
       email: 'vince@thezooniverse.org.eu',
       firstName: 'Vince',
       lastName: 'Noir',
-      phone: undefined
+      phone: '+6441234'
     })
     .yields(null, {
       customer: {

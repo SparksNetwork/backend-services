@@ -1,3 +1,4 @@
+import Ajv from 'sparks-schemas/lib/ajv';
 import {command} from 'sparks-schemas/generators/command';
 import Record = Kinesis.Record;
 import ValidateFunction = ajv.ValidateFunction;
@@ -7,11 +8,15 @@ type SchemaFunction = (message:any) => boolean | Promise<boolean>;
 type ValidationOption = ValidateFunction | SchemaFunction | string | null;
 type ValidationArg = ValidationOption | Promise<ValidationOption>;
 
+const ajv = Ajv();
+
 async function createValidationFunction(fromp:ValidationArg):Promise<SchemaFunction> {
   const from = await Promise.resolve(fromp);
 
-  if (typeof from === 'string') {
-    return command(from) as SchemaFunction;
+  if (typeof from === 'string' && from.startsWith('command.')) {
+    return command(from.split('.').slice(1).join('.')) as any
+  } else if (typeof from === 'string') {
+    return ajv.getSchema(from) as any;
   } else if (!from) {
     return () => true
   }
@@ -56,6 +61,11 @@ export function StreamFunction<T>(schema: ValidationArg, fn:(message:T) => Promi
 
   return async function(e:Lambda.KinesisEvent) {
     const schemaFn = await schemaPromise;
+
+    if (typeof schemaFn !== 'function') {
+      throw new Error('Schema ' + schema + ' not found!');
+    }
+
     const executeFn = executeFnIfSchema(fn, schemaFn);
     return Promise.all(e.Records.map(unwrapEvent).map(executeFn));
   };

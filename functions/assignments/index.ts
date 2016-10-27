@@ -5,8 +5,8 @@ import {AssignmentsCreateCommand} from 'sparks-schemas/types/commands/Assignment
 import {RemoveTransform} from "../../helpers/CommandToDataTransform";
 import {dataCreate} from "../../helpers/dataCreate";
 
-const create = StreamTransform('Assignments.create', async function({domain, uid, payload: {values}}:AssignmentsCreateCommand) {
+const create = StreamTransform('command.Assignments.create', async function({domain, uid, payload: {values}}:AssignmentsCreateCommand) {
   return [dataCreate(domain, [values.oppKey, values.shiftKey].join('-'), uid, values)]
 });
 
-export default apex(spread(create, RemoveTransform('Assignments.remove')));
+export default apex(spread(create, RemoveTransform('command.Assignments.remove')));

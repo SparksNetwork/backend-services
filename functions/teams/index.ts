@@ -28,7 +28,7 @@ async function lookupProjectPartitionKey([message]:any[]):Promise<any[]> {
 }
 
 export default apex(spread(
-  CreateWithOwnerProfileKey('Teams.create', valuesProjectPartitionKey),
-  UpdateTransform('Teams.update', lookupProjectPartitionKey),
-  RemoveTransform('Teams.remove', lookupProjectPartitionKey)
+  CreateWithOwnerProfileKey('teams', 'command.Teams.create', valuesProjectPartitionKey),
+  UpdateTransform('command.Teams.update', lookupProjectPartitionKey),
+  RemoveTransform('command.Teams.remove', lookupProjectPartitionKey)
 ));

@@ -6,7 +6,7 @@ import {lookup} from "../../lib/ExternalFactories/Firebase";
 import {BraintreeGateway} from "../../lib/ExternalFactories/Braintree";
 import {dataUpdate} from "../../helpers/dataUpdate";
 
-const generatePaymentToken = StreamTransform('Engagements.create', async function({domain, uid, payload: {values}}:EngagementsCreateCommand) {
+const generatePaymentToken = StreamTransform('command.Engagements.create', async function({domain, uid, payload: {values}}:EngagementsCreateCommand) {
 
   const key = [values.oppKey, values.profileKey].join('-');
   const customerId = await lookup('engagementsPayment', 'GatewayCustomers', values.profileKey, 'gatewayId');

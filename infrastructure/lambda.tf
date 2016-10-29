@@ -28,6 +28,16 @@ resource "aws_lambda_function" "commitments" {
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/commitments.zip"))}"
 }
+resource "aws_lambda_function" "dns-register" {
+  filename = "../dist/dns-register.zip"
+  function_name = "sparks_dns-register"
+  handler = "_apex_index.handle"
+  role = "${aws_iam_role.dns-register.arn}"
+  memory_size = 256
+  runtime = "nodejs4.3"
+  timeout = 10
+  source_code_hash = "${base64sha256(file("../dist/dns-register.zip"))}"
+}
 resource "aws_lambda_function" "engagements" {
   filename = "../dist/engagements.zip"
   function_name = "sparks_engagements"
@@ -107,6 +117,16 @@ resource "aws_lambda_function" "gatewayCustomer" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/gatewayCustomer.zip"))}"
+}
+resource "aws_lambda_function" "kafka-register" {
+  filename = "../dist/kafka-register.zip"
+  function_name = "sparks_kafka-register"
+  handler = "_apex_index.handle"
+  role = "${aws_iam_role.kafka-register.arn}"
+  memory_size = 256
+  runtime = "nodejs4.3"
+  timeout = 300
+  source_code_hash = "${base64sha256(file("../dist/kafka-register.zip"))}"
 }
 resource "aws_lambda_function" "memberships" {
   filename = "../dist/memberships.zip"

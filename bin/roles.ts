@@ -63,6 +63,8 @@ getFunctions(function(err, functions) {
   if (err) { exitErr(err); }
 
   async.map<ApexFunction, string>(functions, generateCustomPolicy, function(err, customPolicies) {
+    if (err) { exitErr(err); }
+
     functions.forEach(function (fn) {
       console.log(generateRole(fn));
 

@@ -88,11 +88,17 @@ function sourceMapSupport(fn:ApexFunction) {
         });
       }],
       // remove the temporary source map support code
-      removeSms: ['writeMap', function(results, cb) {
-        unlink(join(fn.path, 'sms.js'), cb);
+      removeSms: ['sms', 'writeMap', function(results, cb) {
+        exists(join(fn.path, 'sms.js'), function(ex) {
+          if (ex) {
+            unlink(join(fn.path, 'sms.js'), cb);
+          } else {
+            cb(null);
+          }
+        });
       }],
       // remove the source map support map
-      removeSmsMap: ['writeMap', function(results, cb) {
+      removeSmsMap: ['sms', 'writeMap', function(results, cb) {
         unlink(join(fn.path, 'sms.js.map'), cb);
       }],
       // Write the new main.js with the prepended source map support bundle

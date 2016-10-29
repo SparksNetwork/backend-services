@@ -61,6 +61,9 @@ apex_1.getFunctions(function (err, functions) {
         util_1.exitErr(err);
     }
     async.map(functions, generateCustomPolicy, function (err, customPolicies) {
+        if (err) {
+            util_1.exitErr(err);
+        }
         functions.forEach(function (fn) {
             console.log(generateRole(fn));
             if (fn.config['stream']) {

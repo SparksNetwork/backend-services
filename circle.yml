@@ -1,0 +1,11 @@
+machine:
+  node:
+    version: 6.7.0
+  services:
+    - docker
+
+deployment:
+  production:
+    branch: master
+    commands:
+      - npm run build:invoker

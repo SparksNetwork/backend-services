@@ -4,6 +4,10 @@ machine:
   services:
     - docker
 
+test:
+  pre:
+    - npm run build
+
 deployment:
   production:
     branch: master

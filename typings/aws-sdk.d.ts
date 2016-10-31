@@ -635,6 +635,16 @@ declare namespace ECS {
     taskDefinition: string;
   }
 
+  interface RequiresAttribute {
+    name: string;
+    value?: string;
+  }
+
+  interface Volume {
+    name: string;
+    host?: { sourcePath: string; };
+  }
+
   interface TaskDefinition {
     taskDefinitionArn: string;
     containerDefinitions: ContainerDefinition[];
@@ -642,15 +652,9 @@ declare namespace ECS {
     taskRoleArn?: string;
     networkMode?: 'bridge' | 'host' | 'none';
     revision?: number;
-    volumes?: {
-      name: string;
-      host?: { sourcePath: string; };
-    }[];
+    volumes?: Volume[];
     status?: 'ACTIVE' | 'INACTIVE';
-    requiresAttributes?: {
-      name: string;
-      value?: string;
-    }[];
+    requiresAttributes?: RequiresAttribute[];
   }
 
   interface ContainerDefinition {
@@ -738,6 +742,21 @@ declare namespace ECS {
   interface RegisterTaskDefinitionResponse {
     taskDefinitionArn: string;
     containerDefinitions: ContainerDefinition[];
+    family: string;
+    taskRoleArn?: string;
+    networkMode: 'bridge' | 'host' | 'none';
+    revision: number;
+    volumes: Volume[];
+    status: 'ACTIVE' | 'INACTIVE';
+    requiresAttributes: RequiresAttribute[];
+  }
+
+  interface DeregisterTaskDefinitionParams {
+    taskDefinition:string;
+  }
+
+  interface DeregisterTaskDefinitionResponse {
+    taskDefinition: TaskDefinition;
   }
 
   interface ContainerOverrides {
@@ -966,6 +985,8 @@ declare module 'aws-sdk' {
     listContainerInstances(params: ECS.ListContainerInstancesParams, callback?: Callback<ECS.ListContainerInstancesResponse>): Response<ECS.ListContainerInstancesResponse>;
 
     registerTaskDefinition(params: ECS.RegisterTaskDefinitionParams, callback?: Callback<ECS.RegisterTaskDefinitionResponse>): Response<ECS.RegisterTaskDefinitionResponse>;
+
+    deregisterTaskDefinition(params: ECS.DeregisterTaskDefinitionParams, callback?: Callback<ECS.DeregisterTaskDefinitionResponse>): Response<ECS.DeregisterTaskDefinitionResponse>;
 
     startTask(params: ECS.StartTaskParams, callback?: Callback<ECS.StartTaskResponse>): Response<ECS.StartTaskResponse>;
 

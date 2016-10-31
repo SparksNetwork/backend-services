@@ -5,6 +5,7 @@ import {
   LambdaFunctionConsumer
 } from "./FunctionConsumer";
 import {localSchemas, remoteSchemas, getSchemasFor} from "./schemas";
+import {error} from "./log";
 
 const mode = process.argv.slice(2)[0];
 const time = Number(process.argv.slice(3)[0] || 10) * 1000;
@@ -44,7 +45,7 @@ if (mode === 'lambda') {
 }
 
 if (!functionConsumer || time < 1) {
-  console.error('[usage] <script> <local or lambda> [config timeout, defaults to 10]');
+  error('[usage] <script> <local or lambda> [config timeout, defaults to 10]');
   process.exit(1);
 }
 
@@ -68,9 +69,9 @@ async function run(time:number) {
 }
 
 process.on('unhandledRejection', function(reason, p) {
-  console.error('unhandled rejection');
-  console.error(reason);
-  console.error(p);
+  error('unhandled rejection');
+  error(reason);
+  error(p);
   process.exit(1);
 });
 

@@ -5,6 +5,7 @@ import {Lambda} from 'aws-sdk';
 import {StreamRecord} from "../lib/StreamPublish";
 import {flatten, filter, identity} from 'ramda';
 import {publishMessages} from "./Publisher";
+import {error, info} from "./log";
 
 interface Schema {
   (message:any):boolean;
@@ -36,14 +37,15 @@ abstract class FunctionConsumer {
 
     try {
       message = JSON.parse(rawMessage.message.value);
-    } catch(error) {
-      console.error(this.fn.name, 'error parsing message on topic', topic, partition);
-      console.error(rawMessage);
+    } catch(err) {
+      error(this.fn.name, 'error parsing message on topic', topic, partition);
+      error(err);
+      error(rawMessage);
       return this.consumer.commitOffset(offset);
     }
 
     if (this.schemas.length === 0 || this.schemas.every(schema => !schema(message))) {
-      console.log(this.fn.name, 'no schema matches on', topic);
+      info(this.fn.name, 'no schema matches on', topic);
       return this.consumer.commitOffset(offset);
     }
 
@@ -94,7 +96,7 @@ export class LambdaFunctionConsumer extends FunctionConsumer {
   }
 
   async messageHandler(message):Promise<StreamRecord<any>[]> {
-    console.log('sending to', this.fn.name);
+    info('sending to', this.fn.name);
 
     const response = await this.lambda.invoke({
       Payload: JSON.stringify(message),

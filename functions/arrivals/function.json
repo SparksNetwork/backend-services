@@ -1,5 +1,4 @@
 {
   "stream": "commands",
-  "environment": {
-  }
+  "schemas": ["command.Arrivals.*"]
 }

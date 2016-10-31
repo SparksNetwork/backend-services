@@ -1,3 +1,4 @@
 {
-  "stream": "data.firebase"
+  "stream": "data.firebase",
+  "schemas": ["data.Profiles.*"]
 }

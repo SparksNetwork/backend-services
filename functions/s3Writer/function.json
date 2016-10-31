@@ -1,5 +1,6 @@
 {
   "stream": "data.firebase",
+  "schemas": ["data"],
   "batchSize": 25,
   "environment": {
     "BUCKET": "streams.sparks.network"

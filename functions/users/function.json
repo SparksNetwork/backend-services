@@ -1,3 +1,4 @@
 {
-  "stream": "commands"
+  "stream": "commands",
+  "schemas": ["command.Users.*"]
 }

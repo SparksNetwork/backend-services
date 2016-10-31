@@ -644,7 +644,7 @@ declare namespace ECS {
     revision?: number;
     volumes?: {
       name: string;
-      host?: { sourceMap: string; };
+      host?: { sourcePath: string; };
     }[];
     status?: 'ACTIVE' | 'INACTIVE';
     requiresAttributes?: {
@@ -726,7 +726,7 @@ declare namespace ECS {
 
   interface RegisterTaskDefinitionParams {
     family: string;
-    taskRoleArn: string;
+    taskRoleArn?: string;
     networkMode?: 'bridge' | 'host' | 'none';
     containerDefinitions: ContainerDefinition[];
     volumes?: {
@@ -838,6 +838,52 @@ declare namespace ECS {
     families: string[];
     nextToken?: string | null;
   }
+
+  interface UpdateServiceParams {
+    cluster: string;
+    service: string;
+    desiredCount?: number;
+    taskDefinition?: string;
+    deploymentConfiguration?: {
+      maximumPercent?: number;
+      minimumHealthyPercent?: number;
+    }
+  }
+
+  interface UpdateServiceResponse {
+    service: {
+      serviceArn: string;
+      serviceName: string;
+      clusterArn: string;
+      loadBalancers?: {
+        targetGroupArn: string;
+        loadBalancerName: string;
+        containerName: string;
+        containerPort: number;
+      }[];
+      status: 'ACTIVE' | 'DRAINING' | 'INACTIVE';
+      desiredCount: number;
+      runningCount: number;
+      pendingCount: number;
+      taskDefinition: string;
+      deploymentConfiguration: {
+        maximumPercent: number;
+        minimumHealthyPercent: number
+      };
+      deployments: {
+        id: string;
+        status: string;
+        taskDefinition: string;
+        desiredCount: number;
+        pendingCount: number;
+        runningCount: number;
+        createdAt: Date;
+        updatedAt: Date;
+      }[];
+      roleArn: string;
+      events: Event[];
+    }
+  }
 }
 
 declare module 'aws-sdk' {
@@ -929,5 +975,7 @@ declare module 'aws-sdk' {
       ListTaskDefinitionsResponse>;
 
     listTaskDefinitionFamilies(params: ECS.ListTaskDefinitionFamiliesParams, callback?: Callback<ECS.ListTaskDefinitionFamiliesResponse>): Response<ECS.ListTaskDefinitionFamiliesResponse>;
+
+    updateService(params: ECS.UpdateServiceParams, callback?: Callback<ECS.UpdateServiceResponse>): Response<ECS.UpdateServiceResponse>;
   }
 }

@@ -13,3 +13,4 @@ deployment:
     branch: master
     commands:
       - npm run build:invoker
+      - npm run deploy:invoker

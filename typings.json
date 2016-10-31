@@ -1,6 +1,6 @@
 {
   "globalDependencies": {
-    "aws-sdk": "github:jemmyw/typed-aws-sdk#5248075f65d6fdb27055a1955cad0bd614aa0c82",
+    "aws-sdk": "github:jemmyw/typed-aws-sdk#0ea0723",
     "browserify": "registry:dt/browserify#12.0.1+20160317120654",
     "cli-color": "registry:dt/cli-color#0.0.0+20160317120654",
     "node": "registry:env/node#6.0.0+20161019193037",

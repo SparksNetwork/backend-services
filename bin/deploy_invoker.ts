@@ -75,10 +75,12 @@ function makeTaskDefinition({taskDefinition, version}:{taskDefinition: ECS.TaskD
 
 function updateService({makeTaskDefinition}:{makeTaskDefinition: ECS.RegisterTaskDefinitionResponse}, cb: (error) => void) {
   console.log(makeTaskDefinition);
+  const taskDef:string = [makeTaskDefinition.taskDefinition.family, makeTaskDefinition.taskDefinition.revision].join(':');
+
   ecs.updateService({
     cluster: 'dispatch',
     service: 'invoker',
-    taskDefinition: makeTaskDefinition.family
+    taskDefinition: taskDef,
   }, cb);
 }
 

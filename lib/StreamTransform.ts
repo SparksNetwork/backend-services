@@ -16,17 +16,21 @@ export type Transform<T,U> = (message:T) => Promise<Array<StreamRecord<U>>>;
  *
  * @param schema
  * @param transform
- * @returns {(e:Record)=>Promise<any>}
+ * @returns {(e:Record, context:string)=>Promise<any>}
  * @constructor
  */
 export function StreamTransform<T,U>(schema, transform:Transform<T,U>) {
-  return StreamFunction<T>(schema, async function(message:T) {
+  return StreamFunction<T>(schema, async function(message:T, context) {
     const records:StreamRecord<U>[] = await transform(message);
 
     if (!records.reduce) {
       throw new Error('StreamTransform expects the function to return the promise of an Array of StreamRecord objects');
     }
 
-    return StreamPublish(records);
+    if (context === 'kinesis') {
+      return StreamPublish(records);
+    } else {
+      return records;
+    }
   });
 }

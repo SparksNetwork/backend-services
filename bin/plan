@@ -6,6 +6,7 @@ echo "Writing attachments"
 node bin/attach.js > infrastructure/attach.tf
 echo "Writing functions"
 node bin/lambda.js > infrastructure/lambda.tf
+node bin/functions.js > dist/functions.json
 
 echo "Planning"
 cd infrastructure

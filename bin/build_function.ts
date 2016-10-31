@@ -41,6 +41,17 @@ function tsc(fn:ApexFunction) {
   }
 }
 
+
+function unlinkIfExists(path, cb) {
+  exists(path, function (ex) {
+    if (ex) {
+      unlink(path, cb);
+    } else {
+      cb(null);
+    }
+  });
+}
+
 /**
  * This function installs the source-map-support library into the lambda function
  * code. It does this by creating a new bundle that just calls the install
@@ -89,17 +100,11 @@ function sourceMapSupport(fn:ApexFunction) {
       }],
       // remove the temporary source map support code
       removeSms: ['sms', 'writeMap', function(results, cb) {
-        exists(join(fn.path, 'sms.js'), function(ex) {
-          if (ex) {
-            unlink(join(fn.path, 'sms.js'), cb);
-          } else {
-            cb(null);
-          }
-        });
+        unlinkIfExists(join(fn.path, 'sms.js'), cb);
       }],
       // remove the source map support map
       removeSmsMap: ['sms', 'writeMap', function(results, cb) {
-        unlink(join(fn.path, 'sms.js.map'), cb);
+        unlinkIfExists(join(fn.path, 'sms.js.map'), cb);
       }],
       // Write the new main.js with the prepended source map support bundle
       writeMain: ['sms', 'main', function ({sms, main}, cb) {

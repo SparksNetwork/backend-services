@@ -7,6 +7,7 @@ resource "aws_lambda_function" "arrivals" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/arrivals.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "assignments" {
   filename = "../dist/assignments.zip"
@@ -17,6 +18,7 @@ resource "aws_lambda_function" "assignments" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/assignments.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "commitments" {
   filename = "../dist/commitments.zip"
@@ -27,6 +29,7 @@ resource "aws_lambda_function" "commitments" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/commitments.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "dns-register" {
   filename = "../dist/dns-register.zip"
@@ -37,6 +40,7 @@ resource "aws_lambda_function" "dns-register" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/dns-register.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "engagements" {
   filename = "../dist/engagements.zip"
@@ -47,6 +51,7 @@ resource "aws_lambda_function" "engagements" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/engagements.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "engagementsNotifications" {
   filename = "../dist/engagementsNotifications.zip"
@@ -57,6 +62,7 @@ resource "aws_lambda_function" "engagementsNotifications" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/engagementsNotifications.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "engagementsPayment" {
   filename = "../dist/engagementsPayment.zip"
@@ -67,6 +73,7 @@ resource "aws_lambda_function" "engagementsPayment" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/engagementsPayment.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "engagementsPaymentToken" {
   filename = "../dist/engagementsPaymentToken.zip"
@@ -77,6 +84,7 @@ resource "aws_lambda_function" "engagementsPaymentToken" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/engagementsPaymentToken.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "engagementsReclaim" {
   filename = "../dist/engagementsReclaim.zip"
@@ -87,6 +95,7 @@ resource "aws_lambda_function" "engagementsReclaim" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/engagementsReclaim.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "firebase" {
   filename = "../dist/firebase.zip"
@@ -97,6 +106,7 @@ resource "aws_lambda_function" "firebase" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/firebase.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "fulfillers" {
   filename = "../dist/fulfillers.zip"
@@ -107,6 +117,7 @@ resource "aws_lambda_function" "fulfillers" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/fulfillers.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "gatewayCustomer" {
   filename = "../dist/gatewayCustomer.zip"
@@ -117,6 +128,7 @@ resource "aws_lambda_function" "gatewayCustomer" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/gatewayCustomer.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "kafka-register" {
   filename = "../dist/kafka-register.zip"
@@ -127,6 +139,7 @@ resource "aws_lambda_function" "kafka-register" {
   runtime = "nodejs4.3"
   timeout = 300
   source_code_hash = "${base64sha256(file("../dist/kafka-register.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "memberships" {
   filename = "../dist/memberships.zip"
@@ -137,6 +150,7 @@ resource "aws_lambda_function" "memberships" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/memberships.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "notifications" {
   filename = "../dist/notifications.zip"
@@ -147,6 +161,7 @@ resource "aws_lambda_function" "notifications" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/notifications.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "opps" {
   filename = "../dist/opps.zip"
@@ -157,6 +172,7 @@ resource "aws_lambda_function" "opps" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/opps.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "organizers" {
   filename = "../dist/organizers.zip"
@@ -167,6 +183,7 @@ resource "aws_lambda_function" "organizers" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/organizers.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "profiles" {
   filename = "../dist/profiles.zip"
@@ -177,6 +194,7 @@ resource "aws_lambda_function" "profiles" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/profiles.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "projects" {
   filename = "../dist/projects.zip"
@@ -187,6 +205,7 @@ resource "aws_lambda_function" "projects" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/projects.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "s3Writer" {
   filename = "../dist/s3Writer.zip"
@@ -197,6 +216,7 @@ resource "aws_lambda_function" "s3Writer" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/s3Writer.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "sendgrid" {
   filename = "../dist/sendgrid.zip"
@@ -207,6 +227,7 @@ resource "aws_lambda_function" "sendgrid" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/sendgrid.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "teams" {
   filename = "../dist/teams.zip"
@@ -217,6 +238,7 @@ resource "aws_lambda_function" "teams" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/teams.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }
 resource "aws_lambda_function" "users" {
   filename = "../dist/users.zip"
@@ -227,4 +249,5 @@ resource "aws_lambda_function" "users" {
   runtime = "nodejs4.3"
   timeout = 10
   source_code_hash = "${base64sha256(file("../dist/users.zip"))}"
+  depends_on = ["aws_s3_bucket_object.functions"]
 }

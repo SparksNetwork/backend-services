@@ -1,10 +1,11 @@
 #!/bin/bash
 
 if [ ! -n "$1" ]; then
-    echo "Usage bin/deploy <service>"
-    exit 1
+    bin/build
+    bin/plan -refresh=false
+    bin/apply
+else
+    bin/build $1
+    bin/plan -refresh=false -target=aws_lambda_function.$1
+    bin/apply
 fi
-
-bin/build $1
-bin/plan -refresh=false -target=aws_lambda_function.$1
-bin/apply

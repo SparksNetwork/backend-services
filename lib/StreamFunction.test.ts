@@ -41,7 +41,7 @@ test.serial('invokes function for only matching records', async function(t) {
     }
   ];
 
-  await Promise.all(events.map(event => sf(event)));
+  await Promise.all(events.map(event => sf(event, {context: 'kinesis'})));
 
   t.is(fn.callCount, 2);
   const message1 = fn.firstCall.args[0]

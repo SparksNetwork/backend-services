@@ -29,11 +29,7 @@ async function asgIps(asgName:string):Promise<string[]> {
 
   ec2Info.Reservations.forEach(reservation => {
     reservation.Instances.forEach(instance => {
-      instance.NetworkInterfaces.forEach(ni => {
-        if (ni.Association && ni.Association.PublicIp) {
-          ips.push(ni.Association.PublicIp);
-        }
-      });
+      ips.push(instance.PrivateIpAddress);
     });
   });
 
@@ -79,36 +75,7 @@ async function registerAll(asgName:string, zone:string, record:string) {
   }
 }
 
-async function processLaunch(msg:AsgEvent) {
-  if (msg.AutoScalingGroupName === 'kafka') {
-    await registerAll(msg.AutoScalingGroupName, 'aws.sparks.network', 'zookeeper');
-    await registerAll(msg.AutoScalingGroupName, 'aws.sparks.network', 'kafka');
-  }
-}
-
-async function processTerminate(msg:AsgEvent) {
-  if (msg.AutoScalingGroupName === 'kafka') {
-    await registerAll(msg.AutoScalingGroupName, 'aws.sparks.network', 'zookeeper');
-    await registerAll(msg.AutoScalingGroupName, 'aws.sparks.network', 'kafka');
-  }
-}
-
-async function processRecord(record:SnsEventRecord) {
-  const msg:AsgEvent = JSON.parse(record.Sns.Message);
-
-  if (msg.Event === 'autoscaling:EC2_INSTANCE_LAUNCH') {
-    await processLaunch(msg);
-  }
-
-  if (msg.Event === 'autoscaling:EC2_INSTANCE_TERMINATE') {
-    await processTerminate(msg);
-  }
-}
-
 export default apex(async function(event:SnsEvent) {
-  console.log('dns-register', event);
-
-  return Promise.all(event.Records.map(record => {
-    return processRecord(record);
-  }));
+  await registerAll('kafka', 'aws.sparks.network', 'zookeeper');
+  await registerAll('kafka', 'aws.sparks.network', 'kafka');
 })

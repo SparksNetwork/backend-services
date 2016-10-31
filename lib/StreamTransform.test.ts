@@ -33,7 +33,7 @@ test.serial('single record', async function(t) {
   });
 
   const putRecords = AWS.mock("Kinesis", "putRecords");
-  await func(inputEvent);
+  await func(inputEvent, {context: 'kinesis'});
 
   const stub:SinonStub = putRecords.stub;
   t.is(stub.callCount, 1);
@@ -68,7 +68,7 @@ test.serial('multiple records', async function(t) {
   });
 
   const putRecords = AWS.mock("Kinesis", "putRecords");
-  await func(inputEvent);
+  await func(inputEvent, {context: 'kinesis'});
 
   const stub:SinonStub = putRecords.stub;
   t.is(stub.callCount, 1);
@@ -109,7 +109,7 @@ test.serial('multiple records to multiple streams', async function(t) {
   });
 
   const putRecords = AWS.mock("Kinesis", "putRecords");
-  await func(inputEvent);
+  await func(inputEvent, {context: 'kinesis'});
 
   const stub:SinonStub = putRecords.stub;
   t.is(stub.callCount, 2);
@@ -145,6 +145,6 @@ test.serial('error in transform function', async function(t) {
   })
 
   const putRecords = AWS.mock("Kinesis", "putRecords");
-  t.throws(func(inputEvent), "An error");
+  t.throws(func(inputEvent, {context: 'kinesis'}), "An error");
   t.falsy(putRecords.stub);
 });

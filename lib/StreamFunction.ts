@@ -3,6 +3,7 @@ import {command} from 'sparks-schemas/generators/command';
 import Record = Kinesis.Record;
 import ValidateFunction = ajv.ValidateFunction;
 import KinesisEventRecord = Lambda.KinesisEventRecord;
+import {view, lensPath, unnest} from 'ramda';
 
 interface SchemaFunction {
   (message:any): boolean;
@@ -12,6 +13,8 @@ type ValidationOption = ValidateFunction | SchemaFunction | string | null;
 type ValidationArg = ValidationOption | Promise<ValidationOption>;
 
 const ajv = Ajv();
+
+const contextPath = lensPath(['clientContext', 'context']);
 
 async function createValidationFunction(fromp:ValidationArg):Promise<SchemaFunction> {
   const from = await Promise.resolve(fromp);
@@ -62,33 +65,63 @@ function showInvalidReason(domainAction:string, schemaFn:SchemaFunction, message
  *
  * If the schema is a function then it must return a boolean
  *
- * @param schema
+ * @param e
+ * @param validator
  * @param fn
  * @returns {(e:Record)=>Promise<undefined|any>}
  * @constructor
  */
-export function StreamFunction<T>(schema: ValidationArg, fn:(message:T) => Promise<any>) {
+async function kinesisFunction(e:Lambda.KinesisEvent, validator, fn) {
+  console.log({
+    sequenceNumbers: e.Records.map(record => record.kinesis.sequenceNumber)
+  });
+
+  const messages = e.Records.map(recordToMessage);
+  const validMessages = messages.filter(validator);
+
+  if (validMessages.length === 0 && validator.schema) {
+    showInvalidReason(
+      validator.schema.id,
+      validator,
+      messages
+    )
+  }
+
+  console.log({received: messages.length, valid: validMessages.length});
+  return Promise.all(validMessages.map(message => fn(message, 'kinesis')));
+}
+
+async function kafkaFunction(e, validator, fn):Promise<any[]> {
+  const valid = validator(e);
+
+  if (valid) {
+    return await fn(e, 'kafka');
+  } else if (validator.schema) {
+    showInvalidReason(
+      validator.schema.id,
+      validator,
+      [e]
+    );
+    return [];
+  }
+}
+
+export function StreamFunction<T>(schema: ValidationArg, fn:(message:T, context?:string) => Promise<any>) {
   const schemaPromise = createValidationFunction(schema);
 
-  return async function(e:Lambda.KinesisEvent) {
-    console.log({
-      sequenceNumbers: e.Records.map(record => record.kinesis.sequenceNumber)
-    });
+  return async function(event, ctx) {
+    const validator = await schemaPromise;
 
-    const schemaFn = await schemaPromise;
-
-    if (typeof schemaFn !== 'function') {
+    if (typeof validator !== 'function') {
       throw new Error('Schema ' + schema + ' not found!');
     }
 
-    const messages = e.Records.map(recordToMessage);
-    const validMessages = messages.filter(schemaFn);
+    const context = view(contextPath, ctx) || 'kinesis';
 
-    if (validMessages.length === 0 && typeof schema === 'string') {
-      showInvalidReason(schema, schemaFn, messages);
+    if (context === 'kafka') {
+      return kafkaFunction(event, validator, fn);
+    } else {
+      return kinesisFunction(event, validator, fn);
     }
-
-    console.log({received: messages.length, valid: validMessages.length});
-    return Promise.all(validMessages.map(message => fn(message)));
   };
 }

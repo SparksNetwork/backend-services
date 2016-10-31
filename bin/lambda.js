@@ -19,7 +19,8 @@ async.parallel([
             memory_size: fn.config['memory'] || defaults['memory'] || 128,
             runtime: fn.config['runtime'] || defaults['runtime'] || 'nodejs4.3',
             timeout: fn.config['timeout'] || defaults['timeout'] || 10,
-            source_code_hash: `\${base64sha256(file("../dist/${fn.name}.zip"))}`
+            source_code_hash: `\${base64sha256(file("../dist/${fn.name}.zip"))}`,
+            depends_on: ["aws_s3_bucket_object.functions"]
         }));
     });
 });

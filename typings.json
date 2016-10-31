@@ -12,6 +12,7 @@
     "minimatch": "registry:npm/minimatch#3.0.0+20160723033700",
     "node-uuid": "registry:npm/node-uuid#1.4.7+20160723033700",
     "ramda": "registry:npm/ramda#0.21.0+20160531162943",
-    "sinon": "registry:npm/sinon#1.16.0+20160723033700"
+    "sinon": "registry:npm/sinon#1.16.0+20160723033700",
+    "aws-sdk": "github:jemmyw/typed-aws-sdk#5248075f65d6fdb27055a1955cad0bd614aa0c82"
   }
 }

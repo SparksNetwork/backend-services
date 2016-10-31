@@ -5,6 +5,10 @@ import ValidateFunction = ajv.ValidateFunction;
 import KinesisEventRecord = Lambda.KinesisEventRecord;
 import {view, lensPath, unnest} from 'ramda';
 
+interface LambdaFunction<T> {
+  (message: T, context: ClientContext):Promise<any>;
+}
+
 interface SchemaFunction {
   (message:any): boolean;
   errors?: Array<any>
@@ -47,7 +51,7 @@ function showInvalidReason(domainAction:string, schemaFn:SchemaFunction, message
     console.log(domainAction, 'message did not pass validation');
     schemaFn(message);
     if (schemaFn.errors) {
-      console.log('Errors')
+      console.log('Errors');
       console.log(schemaFn.errors);
     }
     console.log(message);
@@ -71,7 +75,7 @@ function showInvalidReason(domainAction:string, schemaFn:SchemaFunction, message
  * @returns {(e:Record)=>Promise<undefined|any>}
  * @constructor
  */
-async function kinesisFunction(e:Lambda.KinesisEvent, validator, fn) {
+async function kinesisFunction(e:Lambda.KinesisEvent, validator, fn:LambdaFunction<any>) {
   console.log({
     sequenceNumbers: e.Records.map(record => record.kinesis.sequenceNumber)
   });
@@ -88,14 +92,14 @@ async function kinesisFunction(e:Lambda.KinesisEvent, validator, fn) {
   }
 
   console.log({received: messages.length, valid: validMessages.length});
-  return Promise.all(validMessages.map(message => fn(message, 'kinesis')));
+  return Promise.all(validMessages.map(message => fn(message, {context: 'kinesis'})));
 }
 
-async function kafkaFunction(e, validator, fn):Promise<any[]> {
+async function kafkaFunction(e, context:KafkaContext, validator, fn:LambdaFunction<any>):Promise<any[]> {
   const valid = validator(e);
 
   if (valid) {
-    return await fn(e, 'kafka');
+    return await fn(e, context);
   } else if (validator.schema) {
     showInvalidReason(
       validator.schema.id,
@@ -106,7 +110,7 @@ async function kafkaFunction(e, validator, fn):Promise<any[]> {
   }
 }
 
-export function StreamFunction<T>(schema: ValidationArg, fn:(message:T, context?:string) => Promise<any>) {
+export function StreamFunction<T>(schema: ValidationArg, fn:LambdaFunction<any>) {
   const schemaPromise = createValidationFunction(schema);
 
   return async function(event, ctx) {
@@ -119,7 +123,7 @@ export function StreamFunction<T>(schema: ValidationArg, fn:(message:T, context?
     const context = view(contextPath, ctx) || 'kinesis';
 
     if (context === 'kafka') {
-      return kafkaFunction(event, validator, fn);
+      return kafkaFunction(event, ctx.clientContext, validator, fn);
     } else {
       return kinesisFunction(event, validator, fn);
     }

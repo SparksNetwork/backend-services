@@ -1,7 +1,7 @@
 import {StreamFunction} from "./StreamFunction";
 import {StreamPublish, StreamRecord} from "./StreamPublish";
 
-export type Transform<T,U> = (message:T) => Promise<Array<StreamRecord<U>>>;
+export type Transform<T,U> = (message:T, context:ClientContext) => Promise<Array<StreamRecord<U>>>;
 
 /**
  * This indicates a function that takes a message from a kinesis stream and
@@ -20,14 +20,14 @@ export type Transform<T,U> = (message:T) => Promise<Array<StreamRecord<U>>>;
  * @constructor
  */
 export function StreamTransform<T,U>(schema, transform:Transform<T,U>) {
-  return StreamFunction<T>(schema, async function(message:T, context) {
-    const records:StreamRecord<U>[] = await transform(message);
+  return StreamFunction<T>(schema, async function(message:T, context:ClientContext) {
+    const records:StreamRecord<U>[] = await transform(message, context);
 
     if (!records.reduce) {
       throw new Error('StreamTransform expects the function to return the promise of an Array of StreamRecord objects');
     }
 
-    if (context === 'kinesis') {
+    if (context.context === 'kinesis') {
       return StreamPublish(records);
     } else {
       return records;

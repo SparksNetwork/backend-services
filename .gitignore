@@ -1,5 +1,7 @@
 .env
 credentials.json
+braintree.json
+firebase.json
 **/*.js
 **/*.map
 infrastructure/.terraform

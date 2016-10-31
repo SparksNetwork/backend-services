@@ -45,7 +45,9 @@ function savePartition(streamName:string, partitionKey:string, records:Lambda.Ki
     }));
 }
 
-export default apex(async function(event:Lambda.KinesisEvent) {
+export default apex(async function(event:Lambda.KinesisEvent, ctx) {
+  if (ctx.clientContext.context !== 'kinesis') { return; }
+
   const partitions = byPartitionKey(event.Records);
   const promises = Object.keys(partitions).map(key => {
     const [streamName, partitionKey] = key.split('/');

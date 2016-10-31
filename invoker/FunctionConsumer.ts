@@ -24,7 +24,7 @@ abstract class FunctionConsumer {
     }
   }
 
-  protected abstract async messageHandler(message);
+  protected abstract async messageHandler(message, topic, partition);
 
   private async rawMessageHandler(rawMessage, topic, partition) {
     const offset: Kafka.CommitOffset = {
@@ -49,7 +49,7 @@ abstract class FunctionConsumer {
       return this.consumer.commitOffset(offset);
     }
 
-    const newMessages = await this.messageHandler(message);
+    const newMessages = await this.messageHandler(message, topic, partition);
     await publishMessages(filter<any>(identity, newMessages));
 
     return this.consumer.commitOffset(offset);
@@ -95,12 +95,17 @@ export class LambdaFunctionConsumer extends FunctionConsumer {
     });
   }
 
-  async messageHandler(message):Promise<StreamRecord<any>[]> {
+  async messageHandler(message, topic, partition):Promise<StreamRecord<any>[]> {
     debug(this.fn.name, 'sending', message);
+    const context:KafkaContext = {
+      context: 'kafka',
+      topic,
+      partition
+    };
 
     const response = await this.lambda.invoke({
       Payload: JSON.stringify(message),
-      ClientContext: new Buffer(JSON.stringify({context: 'kafka'})).toString('base64'),
+      ClientContext: new Buffer(JSON.stringify(context)).toString('base64'),
       FunctionName: `sparks_${this.fn.name}`,
       InvocationType: 'RequestResponse'
     }).promise();
@@ -115,7 +120,7 @@ export class LambdaFunctionConsumer extends FunctionConsumer {
 }
 
 export class LocalFunctionConsumer extends FunctionConsumer {
-  private local:(event:any, ctx: {clientContext: {context: 'kafka'}}) => Promise<any[]>;
+  private local:(event:any, ctx: {clientContext: KafkaContext}) => Promise<any[]>;
 
   constructor(protected fn:ApexFunction, protected schemas:Schema[], protected options?:Kafka.GroupConsumerOptions) {
     super(fn, schemas, options);
@@ -129,10 +134,14 @@ export class LocalFunctionConsumer extends FunctionConsumer {
     }
   }
 
-  async messageHandler(message) {
+  async messageHandler(message, topic, partition) {
     const response = await this.local(
       JSON.stringify(message),
-      {clientContext: { context: 'kafka' }}
+      {clientContext: {
+        context: 'kafka',
+        topic,
+        partition
+      }}
     );
 
     return flatten([response]);

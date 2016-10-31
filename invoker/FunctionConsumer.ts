@@ -5,7 +5,7 @@ import {Lambda} from 'aws-sdk';
 import {StreamRecord} from "../lib/StreamPublish";
 import {flatten, filter, identity} from 'ramda';
 import {publishMessages} from "./Publisher";
-import {error, info} from "./log";
+import {error, info, debug} from "./log";
 
 interface Schema {
   (message:any):boolean;
@@ -96,7 +96,7 @@ export class LambdaFunctionConsumer extends FunctionConsumer {
   }
 
   async messageHandler(message):Promise<StreamRecord<any>[]> {
-    info('sending to', this.fn.name);
+    debug(this.fn.name, 'sending', message);
 
     const response = await this.lambda.invoke({
       Payload: JSON.stringify(message),
@@ -106,6 +106,7 @@ export class LambdaFunctionConsumer extends FunctionConsumer {
     }).promise();
 
     if (response.FunctionError) {
+      error(this.fn.name, 'error', response);
       throw new Error(response.Payload.toString());
     }
 

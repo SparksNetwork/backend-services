@@ -1,7 +1,6 @@
+import {readFileSync} from "fs";
 const braintree = require('braintree');
 import {GatewayOptions, Gateway} from "../../typings/braintree";
-
-const cfg = process.env as any;
 
 let staticGateway: Gateway;
 
@@ -26,11 +25,13 @@ export function BraintreeGateway(gateway?) {
     staticGateway = gateway;
   }
   if (!staticGateway) {
+    const credentials = JSON.parse(readFileSync('braintree.json', 'utf-8'));
+
     const options: GatewayOptions = {
-      environment: braintree.Environment[cfg.BT_ENVIRONMENT],
-      merchantId: cfg.BT_MERCHANT_ID,
-      publicKey: cfg.BT_PUBLIC_KEY,
-      privateKey: cfg.BT_PRIVATE_KEY
+      environment: braintree.Environment[credentials.environment],
+      merchantId: credentials.merchant_id,
+      publicKey: credentials.public_key,
+      privateKey: credentials.private_key
     };
 
     staticGateway = braintree.connect(options);

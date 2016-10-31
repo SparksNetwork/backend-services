@@ -21,7 +21,7 @@ if (!path || path === '') {
   process.exit(1);
 }
 
-const name:string = path.split('/').slice(-1)[0];
+const name: string = path.split('/').slice(-1)[0];
 
 /**
  * Runs tsc, but only if the index.js file does not exist already.
@@ -29,9 +29,9 @@ const name:string = path.split('/').slice(-1)[0];
  * @param fn
  * @returns {(cb:any)=>undefined}
  */
-function tsc(fn:ApexFunction) {
-  return function(cb) {
-    exists(join(fn.path, 'index.js'), function(tsExists) {
+function tsc(fn: ApexFunction) {
+  return function (cb) {
+    exists(join(fn.path, 'index.js'), function (tsExists) {
       if (!tsExists) {
         exec('node_modules/.bin/tsc', cb);
       } else {
@@ -53,9 +53,9 @@ function unlinkIfExists(path, cb) {
 }
 
 /**
- * This function installs the source-map-support library into the lambda function
- * code. It does this by creating a new bundle that just calls the install
- * and then prepending that to the main bundle.
+ * This function installs the source-map-support library into the lambda
+ * function code. It does this by creating a new bundle that just calls the
+ * install and then prepending that to the main bundle.
  *
  * After doing this it rewrites the bundle source map by loading all of the
  * typescript source maps and looking up the original positions. It also has
@@ -65,8 +65,8 @@ function unlinkIfExists(path, cb) {
  * @param fn
  * @returns {(cb:any)=>undefined}
  */
-function sourceMapSupport(fn:ApexFunction) {
-  return function(cb) {
+function sourceMapSupport(fn: ApexFunction) {
+  return function (cb) {
     async.auto({
       // Write the source map support code into a file
       writeSms: function (cb) {
@@ -78,10 +78,13 @@ function sourceMapSupport(fn:ApexFunction) {
       },
       // Load every map file we can find in the code, excluding node_modules and
       // the other lambda functions
-      maps: function(cb) {
-        glob('**/*.map', {ignore: ['node_modules/**/*', `functions/!(${fn.name})/**/*`], nodir: true}, function(err, files) {
-          const tasks = files.reduce(function(acc, file) {
-            const name = file.split('.').slice(0,-1).join('.');
+      maps: function (cb) {
+        glob('**/*.map', {
+          ignore: ['node_modules/**/*', `functions/!(${fn.name})/**/*`],
+          nodir: true
+        }, function (err, files) {
+          const tasks = files.reduce(function (acc, file) {
+            const name = file.split('.').slice(0, -1).join('.');
             acc[name] = async.apply(readJsonFile, file);
             return acc;
           }, {});
@@ -99,11 +102,11 @@ function sourceMapSupport(fn:ApexFunction) {
         });
       }],
       // remove the temporary source map support code
-      removeSms: ['sms', 'writeMap', function(results, cb) {
+      removeSms: ['sms', 'writeMap', function (results, cb) {
         unlinkIfExists(join(fn.path, 'sms.js'), cb);
       }],
       // remove the source map support map
-      removeSmsMap: ['sms', 'writeMap', function(results, cb) {
+      removeSmsMap: ['sms', 'writeMap', function (results, cb) {
         unlinkIfExists(join(fn.path, 'sms.js.map'), cb);
       }],
       // Write the new main.js with the prepended source map support bundle
@@ -116,7 +119,7 @@ function sourceMapSupport(fn:ApexFunction) {
       writeMap: ['sms', 'maps', function ({sms, maps}, cb) {
         const lines: number = sms.split("\n").length;
 
-        const consumers = Object.keys(maps).reduce(function(acc, name) {
+        const consumers = Object.keys(maps).reduce(function (acc, name) {
           acc[name] = new SourceMapConsumer(maps[name]);
           return acc;
         }, {});
@@ -124,7 +127,7 @@ function sourceMapSupport(fn:ApexFunction) {
         const gen = new SourceMapGenerator();
 
         consumers[join(fn.path, 'main.js')].eachMapping(function (mappingItem) {
-          const original:SourceMapConsumer = consumers[mappingItem.source];
+          const original: SourceMapConsumer = consumers[mappingItem.source];
           const originalMapping = original ? original.originalPositionFor({
             line: mappingItem.originalLine,
             column: mappingItem.originalColumn
@@ -180,7 +183,7 @@ function sourceMapSupport(fn:ApexFunction) {
  * @returns {(cb:any)=>undefined}
  */
 function browserify(fn) {
-  return function(cb) {
+  return function (cb) {
     const cmd = `browserify --debug --node -s default -t babelify ${fn.path}/index.js \
     | exorcist ${fn.path}/main.js.map > ${fn.path}/main.js`;
 
@@ -195,38 +198,43 @@ function browserify(fn) {
  * @param fn
  * @returns {(cb:any)=>undefined}
  */
-function injectFirebaseCredentials(fn) {
-  return function(cb) {
+function injectCredentials(name: string, output: string, fn) {
+  return function (cb) {
     async.waterfall([
-      function(cb) {
+      function (cb) {
         const cmd = "cd infrastructure; terraform output -json";
         execJson(cmd, cb);
       },
-      function(object, cb) {
-        const s3:S3 = new S3({
+      function (object, cb) {
+        const s3: S3 = new S3({
           signatureVersion: 'v4'
         });
         s3.getObject({
-          Bucket: object.firebase_credentials_bucket.value,
-          Key: object.firebase_credentials_key.value
+          Bucket: object[name + '_credentials_bucket'].value,
+          Key: object[name + '_credentials_key'].value
         }, cb)
       },
-      function(response:GetObjectResponse, cb) {
-        writeFile(join(fn.path, 'credentials.json'), response.Body, cb);
+      function (response: GetObjectResponse, cb) {
+        writeFile(join(fn.path, output), response.Body, cb);
       }
     ], cb)
   }
 }
 
-getFunction(name, function(err, fn:ApexFunction) {
-  if (err) { exitErr(err); }
+getFunction(name, function (err, fn: ApexFunction) {
+  if (err) {
+    exitErr(err);
+  }
 
   async.series([
-    asyncTime('firebase', injectFirebaseCredentials(fn)),
-    asyncTime('tsc', tsc(fn)),
+    async.apply(async.parallel, [
+      asyncTime('firebase', injectCredentials('firebase', 'firebase.json', fn)),
+      asyncTime('braintree', injectCredentials('braintree', 'braintree.json', fn)),
+      asyncTime('tsc', tsc(fn)),
+    ]),
     asyncTime('browserify', browserify(fn)),
     asyncTime('source-map-support', sourceMapSupport(fn))
-  ], function(err) {
+  ], function (err) {
     if (err) {
       console.log("\n");
       console.log('ERROR', err);

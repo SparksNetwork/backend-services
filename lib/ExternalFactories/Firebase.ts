@@ -48,13 +48,13 @@ export function establishConnection(name:string, cn?:any):firebase.app.App {
   if (cn) { connection = cn; }
   if (connection) { return connection; }
 
-  const credentials = JSON.parse(fs.readFileSync('credentials.json') as any);
+  const credentials = JSON.parse(fs.readFileSync('firebase.json') as any);
   const project = credentials['project_id'];
   const url = `https://${project}.firebaseio.com`;
 
   const app = fb.initializeApp({
     databaseURL: url,
-    serviceAccount: 'credentials.json',
+    serviceAccount: 'firebase.json',
     databaseAuthVariableOverride: {
       uid: name
     }

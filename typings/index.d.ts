@@ -1,4 +1,5 @@
 /// <reference path="braintree.d.ts" />
+/// <reference path="globals/aws-sdk/index.d.ts" />
 /// <reference path="globals/browserify/index.d.ts" />
 /// <reference path="globals/cli-color/index.d.ts" />
 /// <reference path="globals/node/index.d.ts" />

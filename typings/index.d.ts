@@ -3,6 +3,7 @@
 /// <reference path="globals/cli-color/index.d.ts" />
 /// <reference path="globals/node/index.d.ts" />
 /// <reference path="globals/source-map/index.d.ts" />
+/// <reference path="globals/winston/index.d.ts" />
 /// <reference path="modules/async/index.d.ts" />
 /// <reference path="modules/farmhash/index.d.ts" />
 /// <reference path="modules/glob/index.d.ts" />

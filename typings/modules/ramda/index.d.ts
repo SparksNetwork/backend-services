@@ -320,7 +320,7 @@ namespace R {
         /**
          * TODO composeP
          */
-        composeP(...fns:any[]):(...args:any[]) => any;
+
 
         /**
          * Returns a new list consisting of the elements of the first list followed by the elements

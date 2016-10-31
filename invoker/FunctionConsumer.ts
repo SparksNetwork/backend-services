@@ -4,19 +4,23 @@ import {RoundRobinAssignment} from "no-kafka";
 import {Lambda} from 'aws-sdk';
 import {StreamRecord} from "../lib/StreamPublish";
 import {flatten, filter, identity} from 'ramda';
-import {getSchemasFor} from "./schemas";
 import {publishMessages} from "./Publisher";
 
+interface Schema {
+  (message:any):boolean;
+}
+
+/**
+ * Implementing classes take an ApexFunction and consume messages from the
+ * kafka topics for that ApexFunction that match the schemas.
+ */
 abstract class FunctionConsumer {
   private consumer:GroupConsumer;
-  private schemas:((message:any) => boolean)[];
 
-  constructor(protected fn:ApexFunction, protected options?:Kafka.GroupConsumerOptions) {
+  constructor(protected fn:ApexFunction, protected schemas:Schema[], protected options?:Kafka.GroupConsumerOptions) {
     if (!fn.config['stream']) {
       throw new Error(`The function ${fn.name} does not have a stream specified`);
     }
-
-    this.schemas = getSchemasFor(fn);
   }
 
   protected abstract async messageHandler(message);
@@ -81,8 +85,8 @@ abstract class FunctionConsumer {
 export class LambdaFunctionConsumer extends FunctionConsumer {
   private lambda:Lambda;
 
-  constructor(protected fn:ApexFunction, protected options?:Kafka.GroupConsumerOptions) {
-    super(fn, options);
+  constructor(protected fn:ApexFunction, protected schemas:Schema[], protected options?:Kafka.GroupConsumerOptions) {
+    super(fn, schemas, options);
 
     this.lambda = new Lambda({
       region: process.env['AWS_REGION']
@@ -110,8 +114,8 @@ export class LambdaFunctionConsumer extends FunctionConsumer {
 export class LocalFunctionConsumer extends FunctionConsumer {
   private local:(event:any, ctx: {clientContext: {context: 'kafka'}}) => Promise<any[]>;
 
-  constructor(protected fn:ApexFunction, protected options?:Kafka.GroupConsumerOptions) {
-    super(fn, options);
+  constructor(protected fn:ApexFunction, protected schemas:Schema[], protected options?:Kafka.GroupConsumerOptions) {
+    super(fn, schemas, options);
     const module = require('../' + fn.path);
     if (typeof module.default === 'function') {
       this.local = module.default;

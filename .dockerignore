@@ -1,0 +1,5 @@
+node_modules/
+dist/
+infrastructure/
+credentials.json
+.env

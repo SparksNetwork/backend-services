@@ -4,11 +4,13 @@ import {
   LocalFunctionConsumer,
   LambdaFunctionConsumer
 } from "./FunctionConsumer";
+import {localSchemas, remoteSchemas, getSchemasFor} from "./schemas";
 
 const mode = process.argv.slice(2)[0];
 const time = Number(process.argv.slice(3)[0] || 10) * 1000;
 
 let fetchFunctions:() => Promise<ApexFunction[]>;
+let fetchSchemas:() => Promise<any>;
 let functionConsumer;
 
 if (mode === 'local') {
@@ -22,7 +24,7 @@ if (mode === 'local') {
       });
     });
   };
-
+  fetchSchemas = localSchemas;
   functionConsumer = LocalFunctionConsumer
 }
 
@@ -36,8 +38,8 @@ if (mode === 'lambda') {
     }).promise();
 
     return JSON.parse(response.Body as any);
-  }
-
+  };
+  fetchSchemas = remoteSchemas;
   functionConsumer = LambdaFunctionConsumer;
 }
 
@@ -48,10 +50,11 @@ if (!functionConsumer || time < 1) {
 
 async function runFor(time:number) {
   const functions = await fetchFunctions();
+  const ajv = await fetchSchemas();
 
   const consumers = functions
     .filter(fn => fn.config['stream'])
-    .map(fn => new functionConsumer(fn, {
+    .map(fn => new functionConsumer(fn, getSchemasFor(ajv, fn), {
       connectionString: process.env['KAFKA_CONNECTION']
     }));
 

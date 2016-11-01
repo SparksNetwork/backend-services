@@ -5,7 +5,7 @@ import {Lambda} from 'aws-sdk';
 import {StreamRecord} from "../lib/StreamPublish";
 import {flatten, filter, identity} from 'ramda';
 import {publishMessages} from "./Publisher";
-import {error, info, debug} from "./log";
+import {error, debug} from "./log";
 
 interface Schema {
   (message:any):boolean;
@@ -27,6 +27,9 @@ abstract class FunctionConsumer {
   protected abstract async messageHandler(message, topic, partition);
 
   private async rawMessageHandler(rawMessage, topic, partition) {
+    const fnStart = Date.now();
+    let start = Date.now();
+
     const offset: Kafka.CommitOffset = {
       topic,
       partition,
@@ -43,14 +46,22 @@ abstract class FunctionConsumer {
       error(rawMessage);
       return this.consumer.commitOffset(offset);
     }
+    debug(this.fn.name, 'parse time', Date.now() - start);
+    start = Date.now();
 
     if (this.schemas.length === 0 || this.schemas.every(schema => !schema(message))) {
-      info(this.fn.name, 'no schema matches on', topic);
       return this.consumer.commitOffset(offset);
     }
 
+    debug(this.fn.name, 'validation time', Date.now() - start);
+    start = Date.now();
     const newMessages = await this.messageHandler(message, topic, partition);
+    debug(this.fn.name, 'execution tmie', Date.now() - start);
+    start = Date.now();
+
     await publishMessages(filter<any>(identity, newMessages));
+    debug(this.fn.name, 'publish time', Date.now() - start);
+    debug(this.fn.name, 'total time', Date.now() - fnStart);
 
     return this.consumer.commitOffset(offset);
   }

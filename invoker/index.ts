@@ -5,7 +5,7 @@ import {
   LambdaFunctionConsumer
 } from "./FunctionConsumer";
 import {localSchemas, remoteSchemas, getSchemasFor} from "./schemas";
-import {error, debug} from "./log";
+import {error} from "./log";
 
 const mode = process.argv.slice(2)[0];
 const time = Number(process.argv.slice(3)[0] || 10) * 1000;
@@ -64,9 +64,7 @@ async function runFor(time:number) {
 
 async function run(time:number) {
   while (true) {
-    debug('run for', time);
     await runFor(time);
-    debug('run finished');
   }
 }
 

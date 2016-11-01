@@ -99,6 +99,7 @@ async function kafkaFunction(e, context:KafkaContext, validator, fn:LambdaFuncti
   const valid = validator(e);
 
   if (valid) {
+    console.log(e);
     return await fn(e, context);
   } else if (validator.schema) {
     showInvalidReason(

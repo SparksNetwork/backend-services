@@ -5,9 +5,11 @@ import {
 import {localSchemas, remoteSchemas, getSchemasFor} from "./schemas";
 import {error} from "./log";
 import {localFunctions, remoteFunctions} from "./functions";
+import {Publisher} from "./Publisher";
 
 const mode = process.argv.slice(2)[0];
 const time = Number(process.argv.slice(3)[0] || 10) * 1000;
+const connectionString = process.env['KAFKA_CONNECTION'];
 
 if (!(mode && time >= 1)) {
   error('[usage] <script> <local or lambda> [config timeout, defaults to 10]');
@@ -18,10 +20,13 @@ async function runLambda(time:number) {
   const functions = await remoteFunctions();
   const schemas = await remoteSchemas();
 
+  const publisher = new Publisher({connectionString});
+  await publisher.init();
+
   const consumers = functions
     .filter(fn => fn.config['stream'])
-    .map(fn => new LambdaFunctionConsumer(fn, getSchemasFor(schemas, fn), {
-      connectionString: process.env['KAFKA_CONNECTION']
+    .map(fn => new LambdaFunctionConsumer(fn, getSchemasFor(schemas, fn), publisher, {
+      connectionString
     }));
 
   return Promise.all(consumers.map(consumer => consumer.runFor(time)));
@@ -31,10 +36,13 @@ async function runLocal(time:number) {
   const functions = await localFunctions();
   const schemas = await localSchemas();
 
+  const publisher = new Publisher({connectionString});
+  await publisher.init();
+
   const consumers = functions
     .filter(fn => fn.config['stream'])
-    .map(fn => new LocalFunctionConsumer(fn, getSchemasFor(schemas, fn), {
-      connectionString: process.env['KAFKA_CONNECTION']
+    .map(fn => new LocalFunctionConsumer(fn, getSchemasFor(schemas, fn), publisher, {
+      connectionString
     }));
 
   return Promise.all(consumers.map(consumer => consumer.runFor(time)));

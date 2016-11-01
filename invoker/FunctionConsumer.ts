@@ -4,8 +4,8 @@ import {RoundRobinAssignment} from "no-kafka";
 import {Lambda} from 'aws-sdk';
 import {StreamRecord} from "../lib/StreamPublish";
 import {flatten, filter, identity} from 'ramda';
-import {publishMessages} from "./Publisher";
 import {error, debug} from "./log";
+import {Publisher} from "./Publisher";
 
 interface Schema {
   (message:any):boolean;
@@ -18,7 +18,7 @@ interface Schema {
 abstract class FunctionConsumer {
   private consumer:GroupConsumer;
 
-  constructor(protected fn:ApexFunction, protected schemas:Schema[], protected options?:Kafka.GroupConsumerOptions) {
+  constructor(protected fn:ApexFunction, protected schemas:Schema[], protected publisher:Publisher, protected options?:Kafka.GroupConsumerOptions) {
     if (!fn.config['stream']) {
       throw new Error(`The function ${fn.name} does not have a stream specified`);
     }
@@ -59,7 +59,7 @@ abstract class FunctionConsumer {
     debug(this.fn.name, 'execution tmie', Date.now() - start);
     start = Date.now();
 
-    await publishMessages(filter<any>(identity, newMessages));
+    await this.publisher.publishMessages(filter<any>(identity, newMessages));
     debug(this.fn.name, 'publish time', Date.now() - start);
     debug(this.fn.name, 'total time', Date.now() - fnStart);
 
@@ -98,8 +98,8 @@ abstract class FunctionConsumer {
 export class LambdaFunctionConsumer extends FunctionConsumer {
   private lambda:Lambda;
 
-  constructor(protected fn:ApexFunction, protected schemas:Schema[], protected options?:Kafka.GroupConsumerOptions) {
-    super(fn, schemas, options);
+  constructor(protected fn:ApexFunction, protected schemas:Schema[], protected publisher:Publisher, protected options?:Kafka.GroupConsumerOptions) {
+    super(fn, schemas, publisher, options);
 
     this.lambda = new Lambda({
       region: process.env['AWS_REGION']
@@ -133,8 +133,8 @@ export class LambdaFunctionConsumer extends FunctionConsumer {
 export class LocalFunctionConsumer extends FunctionConsumer {
   private local:(event:any, ctx: {clientContext: KafkaContext}) => Promise<any[]>;
 
-  constructor(protected fn:ApexFunction, protected schemas:Schema[], protected options?:Kafka.GroupConsumerOptions) {
-    super(fn, schemas, options);
+  constructor(protected fn:ApexFunction, protected schemas:Schema[], protected publisher:Publisher, protected options?:Kafka.GroupConsumerOptions) {
+    super(fn, schemas, publisher, options);
     const module = require('../' + fn.path);
     if (typeof module.default === 'function') {
       this.local = module.default;

@@ -49,7 +49,13 @@ async function getTaskDefinition() {
 }
 
 async function makeTaskDefinition(taskDefinition:ECS.TaskDefinition, version:string) {
-  taskDefinition.containerDefinitions[0].image = [repositoryUrl, version].join(':');
+  const container = taskDefinition.containerDefinitions[0];
+  container.image = [repositoryUrl, version].join(':');
+  container.environment = container.environment.filter(item => item.name !== 'VERSION');
+  container.environment.push({
+    name: 'VERSION',
+    value: version
+  });
 
   const existingTaskArns = await ecs.listTaskDefinitions({
     familyPrefix: family,
@@ -77,7 +83,7 @@ async function updateService(taskDefinition:{family:string, revision:number}) {
   return ecs.updateService({
     cluster: cluster,
     service: family,
-    taskDefinition: taskDef,
+    taskDefinition: taskDef
   }).promise();
 }
 

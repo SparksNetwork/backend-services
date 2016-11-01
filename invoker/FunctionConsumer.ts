@@ -6,6 +6,7 @@ import {StreamRecord} from "../lib/StreamPublish";
 import {flatten, filter, identity} from 'ramda';
 import {error, debug} from "./log";
 import {Publisher} from "./Publisher";
+import {Kafka} from "no-kafka";
 
 interface Schema {
   (message:any):boolean;

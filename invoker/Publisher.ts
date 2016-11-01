@@ -2,6 +2,7 @@ import {Producer} from "no-kafka";
 import farmhash = require("farmhash");
 import {StreamRecord} from "../lib/StreamPublish";
 import {debug} from "./log";
+import {Kafka} from "no-kafka";
 
 function farmhashPartitioner(topic:string, partitions:Kafka.PartitionInfo[], message) {
   const hash = farmhash.hash32(message.key);

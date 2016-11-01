@@ -17,6 +17,7 @@ function exitUsage() {
 
 if (process.argv.slice(2).length < 3) { exitUsage(); }
 const [cluster, family, repositoryUrl] = process.argv.slice(2);
+console.log('Deploying', family, 'to', cluster);
 
 function getVersion(cb: (error, version: string) => void) {
   exec('git rev-parse --short HEAD', function (error, stdout) {
@@ -24,21 +25,24 @@ function getVersion(cb: (error, version: string) => void) {
   });
 }
 
-function getTaskDefinitionArn(cb: (error, arn: string) => void) {
+function getTaskDefinitionArn(cb: (error, arn?: string) => void) {
   ecs.listTaskDefinitions({
     familyPrefix: family,
     status: 'ACTIVE'
   }, function (err, response) {
+    if (err) { return cb(err); }
+
     if (response.taskDefinitionArns.length === 0) {
       ecs.listTaskDefinitions({
         familyPrefix: family,
         status: 'INACTIVE'
       }, function(err, response) {
+        if (err) { return cb(err); }
         console.log(response.taskDefinitionArns);
-        cb(err, response.taskDefinitionArns[0]);
+        cb(null, response.taskDefinitionArns[0]);
       });
     } else {
-      cb(err, response.taskDefinitionArns[0]);
+      cb(null, response.taskDefinitionArns[0]);
     }
   });
 }

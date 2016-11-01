@@ -5,7 +5,7 @@ if (process.env['CLOUDWATCH_LOG_GROUP']) {
   const cw = require('winston-cloudwatch');
   winston.add(cw, {
     logGroupName: process.env['CLOUDWATCH_LOG_GROUP'],
-    logStreamName: Date.now().toString(),
+    logStreamName: [process.env['VERSION'], Date.now()/1000].join('-'),
     awsRegion: process.env['AWS_REGION'],
     level: 'debug'
   });

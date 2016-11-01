@@ -11,7 +11,6 @@ function exitUsage() {
 
 if (process.argv.slice(2).length < 3) { exitUsage(); }
 const [cluster, family, repositoryUrl] = process.argv.slice(2);
-console.log('Deploying', family, 'to', cluster);
 
 function getVersion():Promise<string> {
   return new Promise((resolve, reject) => {
@@ -83,11 +82,16 @@ async function updateService(taskDefinition:{family:string, revision:number}) {
 }
 
 async function doit() {
+  console.log('Deploying', family, 'to', cluster);
+
   const version = await getVersion();
+  console.log(`Making new definition for ${version}`);
+
   const taskDefinition = await getTaskDefinition();
   const newDefinition = await makeTaskDefinition(taskDefinition, version);
-  await updateService(newDefinition);
+  console.log(`Registered definition ${newDefinition.family}:${newDefinition.revision}`);
 
+  await updateService(newDefinition);
   console.log('Successfully updated task definition to image', version);
 }
 

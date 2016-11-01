@@ -28,7 +28,6 @@ abstract class FunctionConsumer {
 
   private async rawMessageHandler(rawMessage, topic, partition) {
     const fnStart = Date.now();
-    let start = Date.now();
 
     const offset: Kafka.CommitOffset = {
       topic,
@@ -46,21 +45,18 @@ abstract class FunctionConsumer {
       error(rawMessage);
       return this.consumer.commitOffset(offset);
     }
-    debug(this.fn.name, 'parse time', Date.now() - start);
-    start = Date.now();
 
     if (this.schemas.length === 0 || this.schemas.every(schema => !schema(message))) {
       return this.consumer.commitOffset(offset);
     }
 
-    debug(this.fn.name, 'validation time', Date.now() - start);
-    start = Date.now();
+    let start = Date.now();
     const newMessages = await this.messageHandler(message, topic, partition);
-    debug(this.fn.name, 'execution tmie', Date.now() - start);
-    start = Date.now();
+    debug(this.fn.name, 'execution time', Date.now() - start);
 
-    await this.publisher.publishMessages(filter<any>(identity, newMessages));
-    debug(this.fn.name, 'publish time', Date.now() - start);
+    if (newMessages && newMessages.length > 0) {
+      await this.publisher.publishMessages(filter<any>(identity, newMessages));
+    }
     debug(this.fn.name, 'total time', Date.now() - fnStart);
 
     return this.consumer.commitOffset(offset);
@@ -107,7 +103,6 @@ export class LambdaFunctionConsumer extends FunctionConsumer {
   }
 
   async messageHandler(message, topic, partition):Promise<StreamRecord<any>[]> {
-    debug(this.fn.name, 'sending', message);
     const context:KafkaContext = {
       context: 'kafka',
       topic,

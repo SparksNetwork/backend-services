@@ -7,3 +7,5 @@ firebase.json
 infrastructure/.terraform
 infrastructure/terraform.plan
 dist/
+functions.json
+schemas.json

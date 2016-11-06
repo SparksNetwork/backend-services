@@ -17,7 +17,7 @@ interface AsgEvent {
   Event: string;
 }
 
-const clusterName: string = 'kafka';
+let clusterName: string = 'kafka';
 const region: string = 'us-west-2';
 const brokerIdKey: string = 'brokerId';
 

@@ -1,0 +1,19 @@
+{
+  "resolution": "main",
+  "tree": {
+    "src": "https://raw.githubusercontent.com/typed-contrib/dockerode/b88ec97d60fe98523e15e0fcc0e578030fdddcf4/typings.json",
+    "raw": "registry:npm/dockerode#2.3.1+20161017101347",
+    "main": "lib/docker.d.ts",
+    "dependencies": {
+      "docker-modem": {
+        "src": "https://raw.githubusercontent.com/typed-contrib/docker-modem/17ef3221e18bbf718c422897d63a17295f13e537/typings.json",
+        "raw": "registry:npm/docker-modem#0.3.1+20161017100301",
+        "main": "lib/modem.d.ts",
+        "name": "docker-modem",
+        "type": "typings"
+      }
+    },
+    "name": "dockerode",
+    "type": "typings"
+  }
+}

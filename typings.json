@@ -4,16 +4,21 @@
     "browserify": "registry:dt/browserify#12.0.1+20160317120654",
     "cli-color": "registry:dt/cli-color#0.0.0+20160317120654",
     "node": "registry:env/node#6.0.0+20161019193037",
+    "ora": "registry:dt/ora#0.3.0+20161017160033",
     "source-map": "registry:dt/source-map#0.0.0+20161003134342",
     "winston": "registry:dt/winston#0.0.0+20161006194546"
   },
   "dependencies": {
     "async": "registry:npm/async#2.0.1+20160815105832",
+    "bluebird": "registry:npm/bluebird#3.4.1+20160909132857",
+    "dockerode": "registry:npm/dockerode#2.3.1+20161017101347",
     "glob": "registry:npm/glob#6.0.0+20160723033700",
+    "got": "registry:npm/got#6.3.0+20160524045608",
     "minimatch": "registry:npm/minimatch#3.0.0+20160723033700",
     "no-kafka": "github:jemmyw/typed-no-kafka#1effb1b",
     "node-uuid": "registry:npm/node-uuid#1.4.7+20160723033700",
     "ramda": "registry:npm/ramda#0.21.0+20160531162943",
+    "request": "registry:npm/request#2.69.0+20160428223725",
     "sinon": "registry:npm/sinon#1.16.0+20160723033700"
   }
 }

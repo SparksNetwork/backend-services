@@ -914,6 +914,23 @@ declare namespace ECS {
   }
 }
 
+declare namespace ECR {
+  interface Options extends ServiceOptions {
+  }
+
+  interface GetAuthorizationTokenParams {
+    registryIds: string[];
+  }
+
+  interface GetAuthorizationTokenResponse {
+    authorizationData: {
+      authorizationToken: string;
+      expiresAt: Date;
+      proxyEndpoint: string;
+    }[];
+  }
+}
+
 
 declare module 'aws-sdk' {
   type Callback<T> = (err: any, data: T) => void;
@@ -1008,5 +1025,11 @@ declare module 'aws-sdk' {
     listTaskDefinitionFamilies(params: ECS.ListTaskDefinitionFamiliesParams, callback?: Callback<ECS.ListTaskDefinitionFamiliesResponse>): Response<ECS.ListTaskDefinitionFamiliesResponse>;
 
     updateService(params: ECS.UpdateServiceParams, callback?: Callback<ECS.UpdateServiceResponse>): Response<ECS.UpdateServiceResponse>;
+  }
+
+  export class ECR {
+    constructor(options?: ECR.Options);
+
+    getAuthorizationToken(params: ECR.GetAuthorizationTokenParams, callback?: Callback<ECR.GetAuthorizationTokenResponse>): Response<ECR.GetAuthorizationTokenResponse>;
   }
 }

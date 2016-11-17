@@ -54,6 +54,7 @@
     "sendgrid": "4.7.0",
     "source-map-support": "^0.4.3",
     "sparks-schemas": "github:sparksnetwork/schemas",
+    "typings": "2.0.0",
     "unique-stream": "^2.2.1"
   }
 }

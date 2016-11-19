@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "ava \"**/*test.js\"",
+    "test": "NODE_ENV=test ava \"**/*test.js\"",
     "test:watch": "ava \"**/*test.js\" -w",
     "build": "node_modules/.bin/tsc",
     "build:invoker": "eval $(aws ecr get-login --region=us-west-2) && V=v$(git rev-parse --short HEAD); docker build -t 878160042194.dkr.ecr.us-west-2.amazonaws.com/invoker:${V} .; docker push 878160042194.dkr.ecr.us-west-2.amazonaws.com/invoker:${V}",

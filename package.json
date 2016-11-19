@@ -15,7 +15,7 @@
   "devDependencies": {
     "@types/node": "^6.0.48",
     "async": "^2.1.2",
-    "ava": "^0.16.0",
+    "ava": "^0.17.0",
     "aws-sdk-mock": "^1.5.0",
     "babel-cli": "^6.16.0",
     "babel-plugin-transform-runtime": "^6.15.0",

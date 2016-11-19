@@ -1,6 +1,7 @@
 import * as https from 'https';
 import {Kinesis} from 'aws-sdk';
 import {compose, toPairs, groupBy, prop, splitEvery} from 'ramda';
+import {debug} from "./log";
 
 export interface StreamRecord<U> {
   streamName:string;
@@ -29,7 +30,7 @@ function byStream<T>(records:StreamRecord<T>[]):[string, StreamRecord<T>[]][] {
  * @param kinesis
  * @param streamName
  * @param records
- * @returns {Promise<Kinesis.PutRecordsResponse[]>}
+ * @returns {Promise<any>}
  */
 function putRecords(kinesis:Kinesis, streamName:string, records:StreamRecord<any>[]):Promise<any> {
   return Promise.all(
@@ -50,11 +51,11 @@ function putRecords(kinesis:Kinesis, streamName:string, records:StreamRecord<any
  * to different streams and splitting the records into batches.
  *
  * @param records
- * @returns {Promise<TAll[]>}
+ * @returns {Promise<any[]>}
  * @constructor
  */
 export function StreamPublish(records:StreamRecord<any>[]):Promise<any> {
-  console.log('publish to kinesis', {records: records.length});
+  debug('publish to kinesis', {records: records.length});
 
   const agent = new https.Agent({
     rejectUnauthorized: false

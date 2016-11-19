@@ -1,8 +1,7 @@
 import {apex} from "./apex";
-import KinesisEvent = Lambda.KinesisEvent;
 
-function makeEvent(message):KinesisEvent {
-  const record:Lambda.KinesisEventRecord = {
+function makeEvent(message) {
+  const record = {
     awsRegion: 'us-west-2',
     eventName: 'aws:kinesis:record',
     eventSource: 'aws:kinesis',

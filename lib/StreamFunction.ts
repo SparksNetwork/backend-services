@@ -1,9 +1,8 @@
 import Ajv from 'sparks-schemas/lib/ajv';
 import {command} from 'sparks-schemas/generators/command';
-import Record = Kinesis.Record;
 import ValidateFunction = ajv.ValidateFunction;
-import KinesisEventRecord = Lambda.KinesisEventRecord;
 import {view, lensPath, unnest} from 'ramda';
+import {error, debug} from "./log";
 
 interface LambdaFunction<T> {
   (message: T, context: ClientContext):Promise<any>;
@@ -15,6 +14,28 @@ interface SchemaFunction {
 }
 type ValidationOption = ValidateFunction | SchemaFunction | string | null;
 type ValidationArg = ValidationOption | Promise<ValidationOption>;
+
+interface KinesisEventRecord {
+  kinesis: KinesisRecord;
+  eventSource: 'aws:kinesis';
+  eventID: string;
+  invokeIdentityArn: string;
+  eventVersion: string;
+  eventName: 'aws:kinesis:record';
+  eventSourceARN: string;
+  awsRegion: string;
+}
+
+interface KinesisRecord {
+  partitionKey: string;
+  kinesisSchemaVersion: string;
+  data: string;
+  sequenceNumber: string;
+}
+
+interface KinesisEvent {
+  Records: KinesisEventRecord[];
+}
 
 const ajv = Ajv();
 
@@ -34,11 +55,10 @@ async function createValidationFunction(fromp:ValidationArg):Promise<SchemaFunct
   return from as any;
 }
 
-function recordToMessage(record:Lambda.KinesisEventRecord) {
+function recordToMessage(record:KinesisEventRecord) {
   const kinesis = record.kinesis;
   const data = new Buffer(kinesis.data, 'base64');
-  const message = JSON.parse(data as any)
-  return message;
+  return JSON.parse(data as any);
 }
 
 function showInvalidReason(domainAction:string, schemaFn:SchemaFunction, messages:any[]) {
@@ -48,13 +68,12 @@ function showInvalidReason(domainAction:string, schemaFn:SchemaFunction, message
     if (!message.domain || !message.action) { return; }
     if (message.domain !== domain || message.action !== action) { return; }
 
-    console.log(domainAction, 'message did not pass validation');
+    debug(domainAction, 'message did not pass validation');
     schemaFn(message);
     if (schemaFn.errors) {
-      console.log('Errors');
-      console.log(schemaFn.errors);
+      error(schemaFn.errors);
     }
-    console.log(message);
+    debug(message);
   });
 }
 
@@ -75,8 +94,8 @@ function showInvalidReason(domainAction:string, schemaFn:SchemaFunction, message
  * @returns {(e:Record)=>Promise<undefined|any>}
  * @constructor
  */
-async function kinesisFunction(e:Lambda.KinesisEvent, validator, fn:LambdaFunction<any>) {
-  console.log({
+async function kinesisFunction(e:KinesisEvent, validator, fn:LambdaFunction<any>) {
+  debug({
     sequenceNumbers: e.Records.map(record => record.kinesis.sequenceNumber)
   });
 
@@ -91,7 +110,7 @@ async function kinesisFunction(e:Lambda.KinesisEvent, validator, fn:LambdaFuncti
     )
   }
 
-  console.log({received: messages.length, valid: validMessages.length});
+  debug({received: messages.length, valid: validMessages.length});
   return Promise.all(validMessages.map(message => fn(message, {context: 'kinesis'})));
 }
 
@@ -99,7 +118,7 @@ async function kafkaFunction(e, context:KafkaContext, validator, fn:LambdaFuncti
   const valid = validator(e);
 
   if (valid) {
-    console.log(e);
+    error(e);
     return await fn(e, context);
   } else if (validator.schema) {
     showInvalidReason(

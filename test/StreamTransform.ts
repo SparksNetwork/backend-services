@@ -40,7 +40,7 @@ export async function StreamTransform(message, service):Promise<StreamRecord<any
       throw new Error('Sent no messages');
     }
     const eachCallRecords = stub.getCalls().map(call => {
-      const params: Kinesis.PutRecordsParams = call.args[0];
+      const params = call.args[0];
 
       return params.Records.map(record => ({
         streamName: params.StreamName,

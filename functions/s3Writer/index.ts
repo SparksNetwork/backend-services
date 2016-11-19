@@ -10,7 +10,20 @@ const s3Client:S3 = new S3({
   }
 });
 
-const byPartitionKey = groupBy<Lambda.KinesisEventRecord>(record =>
+interface KinesisEventRecord {
+  eventSourceARN:string;
+  kinesis: {
+    partitionKey: string;
+    sequenceNumber: string;
+    data: string;
+  }
+}
+
+interface KinesisEvent {
+  Records: KinesisEventRecord[];
+}
+
+const byPartitionKey = groupBy<KinesisEventRecord>(record =>
   [
     record.eventSourceARN.split('/').slice(-1)[0],
     record.kinesis.partitionKey
@@ -26,7 +39,7 @@ function gzip(data):Promise<Buffer> {
   })
 }
 
-function savePartition(streamName:string, partitionKey:string, records:Lambda.KinesisEventRecord[]) {
+function savePartition(streamName:string, partitionKey:string, records:KinesisEventRecord[]) {
   const sequenceNumbers = records.map(r => r.kinesis.sequenceNumber);
   const [from, to] = [head(sequenceNumbers), last(sequenceNumbers)];
   const key = [streamName, partitionKey, [from, to].join('-')].join('/');
@@ -37,7 +50,7 @@ function savePartition(streamName:string, partitionKey:string, records:Lambda.Ki
         Key: key,
         Body: buffer,
         ContentEncoding: 'gzip'
-      }).promise()
+      } as any).promise()
     ).then(s3Response => ({
       Key: key,
       Bucket: bucket,
@@ -45,7 +58,7 @@ function savePartition(streamName:string, partitionKey:string, records:Lambda.Ki
     }));
 }
 
-export default apex(async function(event:Lambda.KinesisEvent, ctx) {
+export default apex(async function(event:KinesisEvent, ctx) {
   if (ctx.clientContext.context !== 'kinesis') { return; }
 
   const partitions = byPartitionKey(event.Records);

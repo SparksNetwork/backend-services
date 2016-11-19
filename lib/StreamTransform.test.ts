@@ -3,7 +3,7 @@ import {StreamTransform} from "./StreamTransform";
 import {SinonStub} from "sinon";
 const AWS = require('aws-sdk-mock');
 
-const inputEvent:Lambda.KinesisEvent = {
+const inputEvent = {
   Records: [{
     awsRegion: 'us-west-2',
     eventName: 'aws:kinesis:record',
@@ -142,7 +142,7 @@ test.serial('multiple records to multiple streams', async function(t) {
 test.serial('error in transform function', async function(t) {
   const func = StreamTransform(() => true, async function():Promise<any> {
     throw new Error('An error');
-  })
+  });
 
   const putRecords = AWS.mock("Kinesis", "putRecords");
   t.throws(func(inputEvent, {context: 'kinesis'}), "An error");

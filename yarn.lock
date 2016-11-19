@@ -2,6 +2,10 @@
 # yarn lockfile v1
 
 
+"@types/node@^6.0.48":
+  version "6.0.48"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.48.tgz#86ccc15f66b73cbbc5eb3483398936c585122b3c"
+
 JSONStream@0.10.0:
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/JSONStream/-/JSONStream-0.10.0.tgz#74349d0d89522b71f30f0a03ff9bd20ca6f12ac0"
@@ -364,9 +368,9 @@ aws-sdk-mock@^1.5.0:
     sinon "^1.17.3"
     traverse "^0.6.6"
 
-aws-sdk@^2.2.22, aws-sdk@^2.3.0, aws-sdk@^2.6.6:
-  version "2.6.10"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.6.10.tgz#ae3be91a855fbe01426886e844c38e4d64a5c4c7"
+aws-sdk@^2.2.22, aws-sdk@^2.3.0, aws-sdk@^2.7.5:
+  version "2.7.5"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.7.5.tgz#dac87896459bd4ca3f593fa65478ff43ee1843af"
   dependencies:
     buffer "4.9.1"
     crypto-browserify "1.0.9"

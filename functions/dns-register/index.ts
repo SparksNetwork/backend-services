@@ -1,13 +1,5 @@
 import * as apex from 'apex.js';
-import SnsEvent = Lambda.SnsEvent;
-import SnsEventRecord = Lambda.SnsEventRecord;
 import {Route53, AutoScaling, EC2} from 'aws-sdk';
-
-interface AsgEvent {
-  AutoScalingGroupName: string;
-  EC2InstanceId: string;
-  Event: string;
-}
 
 async function asgIps(asgName:string):Promise<string[]> {
   const asg = new AutoScaling({region: 'us-west-2'});
@@ -75,7 +67,7 @@ async function registerAll(asgName:string, zone:string, record:string) {
   }
 }
 
-export default apex(async function(event:SnsEvent) {
+export default apex(async function() {
   await registerAll('kafka', 'aws.sparks.network', 'zookeeper');
   await registerAll('kafka', 'aws.sparks.network', 'kafka');
 })

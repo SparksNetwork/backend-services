@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "^6.0.48",
     "async": "^2.1.2",
     "ava": "^0.16.0",
     "aws-sdk-mock": "^1.5.0",
@@ -40,7 +41,7 @@
   "dependencies": {
     "ajv": "^4.7.7",
     "apex.js": "^2.0.0",
-    "aws-sdk": "^2.6.6",
+    "aws-sdk": "^2.7.5",
     "bluebird": "^3.4.6",
     "braintree": "^1.42.0",
     "farmhash": "^1.2.1",

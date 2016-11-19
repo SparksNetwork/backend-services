@@ -26,3 +26,4 @@ function lambda(name:string, ...fns:LambdaFunction[]) {
 
 const λ = lambda;
 export {λ, lambda};
+

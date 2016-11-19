@@ -4,7 +4,7 @@ import {SinonSpy} from "sinon";
 import {StreamFunction} from "./StreamFunction";
 
 let seq = 0;
-function generateEvent(message):Lambda.KinesisEventRecord {
+function generateEvent(message) {
   return {
     awsRegion: 'us-west-2',
     eventName: 'aws:kinesis:record',
@@ -27,7 +27,7 @@ test.serial('invokes function for only matching records', async function(t) {
   const validate = message => message.valid;
   const sf = StreamFunction(validate, fn);
 
-  const events:Lambda.KinesisEvent[] = [
+  const events = [
     {
       Records: [
         generateEvent({id: 1, valid: true}),
@@ -44,7 +44,7 @@ test.serial('invokes function for only matching records', async function(t) {
   await Promise.all(events.map(event => sf(event, {context: 'kinesis'})));
 
   t.is(fn.callCount, 2);
-  const message1 = fn.firstCall.args[0]
+  const message1 = fn.firstCall.args[0];
   const message2 = fn.secondCall.args[0];
 
   t.is(message1.id, 1);

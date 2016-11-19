@@ -1,16 +1,15 @@
 import {Readable} from 'stream';
-import Record = Kinesis.Record;
 import {Kinesis} from "aws-sdk";
-import ShardIteratorType = Kinesis.ShardIteratorType;
+import ShardIteratorType = Kinesis.Types.ShardIteratorType;
 
 /**
  * Create a readable stream from a kinesis shard
  */
 export default class ShardStream extends Readable {
   private nextIterator:string;
-  private waitingRecords:Record[] = [];
+  private waitingRecords:Kinesis.Types.Record[] = [];
 
-  constructor(private client:Kinesis, private shardId:string, private iteratorType:ShardIteratorType = "LATEST") {
+  constructor(private client:Kinesis, private streamName:string, private shardId:string, private iteratorType:ShardIteratorType = "LATEST") {
     super({
       objectMode: true,
       highWaterMark: 100
@@ -19,9 +18,10 @@ export default class ShardStream extends Readable {
 
   private getIterator() {
     this.client.getShardIterator({
+      StreamName: this.streamName,
       ShardId: this.shardId,
       ShardIteratorType: this.iteratorType
-    }, (err, response:Kinesis.GetShardIteratorResponse) => {
+    }, (err, response:Kinesis.Types.GetShardIteratorOutput) => {
       if (err) { return setImmediate(() => this.emit('error', err)); }
       this.nextIterator = response.ShardIterator;
       setImmediate(() => this.getNextRecords());
@@ -34,7 +34,7 @@ export default class ShardStream extends Readable {
     return this.pushRecords(drained);
   }
 
-  private pushRecords(records:Kinesis.Record[]) {
+  private pushRecords(records:Kinesis.Types.Record[]) {
     let canPush = true;
 
     records.forEach(record => {
@@ -58,7 +58,7 @@ export default class ShardStream extends Readable {
     this.client.getRecords({
       ShardIterator: this.nextIterator,
       Limit: 100
-    }, (err, data:Kinesis.GetRecordsResponse) => {
+    }, (err, data:Kinesis.Types.GetRecordsOutput) => {
       if (err) { return setImmediate(() => this.emit('error', err)); }
 
       this.nextIterator = data.NextShardIterator;

@@ -10,7 +10,6 @@ import {readFile} from "fs";
 import {readJsonFile, execJson} from "./lib/json";
 import {SourceMapConsumer, SourceMapGenerator} from 'source-map';
 import Mapping = SourceMap.Mapping;
-import GetObjectResponse = S3.GetObjectResponse;
 import {unlink} from "fs";
 import * as glob from 'glob';
 
@@ -97,7 +96,7 @@ function sourceMapSupport(fn: ApexFunction) {
         const cmd = `browserify --debug --node -s default ${fn.path}/sms.js \
         | exorcist ${fn.path}/sms.js.map`;
 
-        exec(cmd, function (err, stdout, stderr) {
+        exec(cmd, function (err, stdout) {
           cb(err, stdout.toString());
         });
       }],
@@ -195,6 +194,8 @@ function browserify(fn) {
  * Download the firebase credentials from s3 and inject them into the lambda
  * function. Terraform knows where the credentials live.
  *
+ * @param name
+ * @param output
  * @param fn
  * @returns {(cb:any)=>undefined}
  */
@@ -214,7 +215,7 @@ function injectCredentials(name: string, output: string, fn) {
           Key: object[name + '_credentials_key'].value
         }, cb)
       },
-      function (response: GetObjectResponse, cb) {
+      function (response: S3.Types.GetObjectOutput, cb) {
         writeFile(join(fn.path, output), response.Body, cb);
       }
     ], cb)

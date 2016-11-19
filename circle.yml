@@ -23,7 +23,9 @@ deployment:
   production:
     branch: master
     commands:
-      - curl -L https://github.com/apex/apex/releases/download/v0.10.3/apex_linux_amd64 > /home/ubuntu/bin/apex
-      - wget https://releases.hashicorp.com/terraform/0.6.8/terraform_0.6.8_linux_amd64.zip
-      - unzip terraform_0.6.8_linux_amd64.zip -d terraform
-      - "PATH=./terraform:$PATH bin/deploy"
+      - wget https://releases.hashicorp.com/terraform/0.7.11/terraform_0.7.11_linux_amd64.zip
+      - unzip terraform_0.7.11_linux_amd64.zip -d terraform
+      - curl -L https://github.com/apex/apex/releases/download/v0.10.3/apex_linux_amd64 > terraform/apex
+      - chmod +x terraform/apex
+      - "cd infrastructure && ../terraform/terraform remote config -backend=S3 -backend-config=\"bucket=terraform.sparks.network\" -backend-config=\"key=apex.tfstate\" && cd .."
+      - "PATH=`pwd`/terraform:`pwd`/node_modules/.bin:$PATH bin/deploy"

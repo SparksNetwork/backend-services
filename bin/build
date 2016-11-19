@@ -31,7 +31,7 @@ done
 
 if [ -n "$MFUNCS" ]; then
     echo "[BUILD] typescript"
-    tsc
+    node_modules/.bin/tsc
 
     echo "[BUILD] apex"
     parallel --no-notice --bar apex build {} '>' dist/{}.zip ::: "${MFUNCS[@]}"

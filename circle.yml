@@ -1,10 +1,29 @@
 machine:
+  pre:
+    - mkdir ~/.yarn-cache
+    - curl -o- -L https://yarnpkg.com/install.sh | bash
   node:
     version: 6.7.0
   services:
     - docker
 
+dependencies:
+  override:
+    - yarn
+  cache_directories:
+    - ~/.yarn-cache
+
 test:
   pre:
-    - npm run build
+    - yarn run build
+  override:
+    - yarn test
 
+deployment:
+  production:
+    branch: master
+    commands:
+      - curl https://raw.githubusercontent.com/apex/apex/master/install.sh | sh
+      - wget https://releases.hashicorp.com/terraform/0.6.8/terraform_0.6.8_linux_amd64.zip
+      - unzip terraform_0.6.8_linux_amd64.zip -d terraform
+      - "PATH=./terraform:$PATH bin/deploy"

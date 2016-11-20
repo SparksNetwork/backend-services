@@ -130,17 +130,6 @@ resource "aws_lambda_function" "gatewayCustomer" {
   source_code_hash = "${base64sha256(file("../dist/gatewayCustomer.zip"))}"
   depends_on = ["aws_s3_bucket_object.functions"]
 }
-resource "aws_lambda_function" "kafka-register" {
-  filename = "../dist/kafka-register.zip"
-  function_name = "sparks_kafka-register"
-  handler = "_apex_index.handle"
-  role = "${aws_iam_role.kafka-register.arn}"
-  memory_size = 256
-  runtime = "nodejs4.3"
-  timeout = 300
-  source_code_hash = "${base64sha256(file("../dist/kafka-register.zip"))}"
-  depends_on = ["aws_s3_bucket_object.functions"]
-}
 resource "aws_lambda_function" "memberships" {
   filename = "../dist/memberships.zip"
   function_name = "sparks_memberships"

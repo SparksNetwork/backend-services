@@ -347,14 +347,6 @@ resource "aws_iam_role_policy" "gatewayCustomer-stream" {
 }
 JSON
 }
-resource "aws_iam_role" "kafka-register" {
-  name_prefix = "kafka-register"
-  path = "/"
-  assume_role_policy = "${file("policies/lambda.json")}"
-  lifecycle {
-    create_before_destroy = true
-}
-}
 resource "aws_iam_role" "memberships" {
   name_prefix = "memberships"
   path = "/"
@@ -691,67 +683,6 @@ JSON
 
 
 
-resource "aws_iam_role_policy" "kafka-register-custom" {
-  name = "custom"
-  role = "${aws_iam_role.kafka-register.id}"
-  policy = <<JSON
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ec2:Describe*",
-        "ec2:waitFor",
-        "ec2:createTags"
-      ],
-      "Resource": [
-        "*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "autoscaling:Describe*"
-      ],
-      "Resource": [
-        "*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ecs:Describe*",
-        "ecs:List*",
-        "ecs:StartTask",
-        "ecs:RegisterTaskDefinition"
-      ],
-      "Resource": [
-        "*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "lambda:InvokeFunction"
-      ],
-      "Resource": [
-        "*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "iam:PassRole"
-      ],
-      "Resource": [
-        "arn:aws:iam::878160042194:role/kafka*"
-      ]
-    }
-  ]
-}
-JSON
-}
 
 
 
@@ -785,15 +716,15 @@ JSON
 resource "aws_iam_policy_attachment" "logs" {
   name = "logs"
   policy_arn = "${aws_iam_policy.logs.arn}"
-  roles = ["${aws_iam_role.arrivals.id}", "${aws_iam_role.assignments.id}", "${aws_iam_role.commitments.id}", "${aws_iam_role.dns-register.id}", "${aws_iam_role.engagements.id}", "${aws_iam_role.engagementsNotifications.id}", "${aws_iam_role.engagementsPayment.id}", "${aws_iam_role.engagementsPaymentToken.id}", "${aws_iam_role.engagementsReclaim.id}", "${aws_iam_role.firebase.id}", "${aws_iam_role.fulfillers.id}", "${aws_iam_role.gatewayCustomer.id}", "${aws_iam_role.kafka-register.id}", "${aws_iam_role.memberships.id}", "${aws_iam_role.notifications.id}", "${aws_iam_role.opps.id}", "${aws_iam_role.organizers.id}", "${aws_iam_role.profiles.id}", "${aws_iam_role.projects.id}", "${aws_iam_role.s3Writer.id}", "${aws_iam_role.sendgrid.id}", "${aws_iam_role.teams.id}", "${aws_iam_role.users.id}"]
+  roles = ["${aws_iam_role.arrivals.id}", "${aws_iam_role.assignments.id}", "${aws_iam_role.commitments.id}", "${aws_iam_role.dns-register.id}", "${aws_iam_role.engagements.id}", "${aws_iam_role.engagementsNotifications.id}", "${aws_iam_role.engagementsPayment.id}", "${aws_iam_role.engagementsPaymentToken.id}", "${aws_iam_role.engagementsReclaim.id}", "${aws_iam_role.firebase.id}", "${aws_iam_role.fulfillers.id}", "${aws_iam_role.gatewayCustomer.id}", "${aws_iam_role.memberships.id}", "${aws_iam_role.notifications.id}", "${aws_iam_role.opps.id}", "${aws_iam_role.organizers.id}", "${aws_iam_role.profiles.id}", "${aws_iam_role.projects.id}", "${aws_iam_role.s3Writer.id}", "${aws_iam_role.sendgrid.id}", "${aws_iam_role.teams.id}", "${aws_iam_role.users.id}"]
 }
 resource "aws_iam_policy_attachment" "write-to-data-firebase" {
   name = "write-to-data-firebase-attachment"
   policy_arn = "${aws_iam_policy.write-to-data-firebase.arn}"
-  roles = ["${aws_iam_role.arrivals.id}", "${aws_iam_role.assignments.id}", "${aws_iam_role.commitments.id}", "${aws_iam_role.dns-register.id}", "${aws_iam_role.engagements.id}", "${aws_iam_role.engagementsNotifications.id}", "${aws_iam_role.engagementsPayment.id}", "${aws_iam_role.engagementsPaymentToken.id}", "${aws_iam_role.engagementsReclaim.id}", "${aws_iam_role.firebase.id}", "${aws_iam_role.fulfillers.id}", "${aws_iam_role.gatewayCustomer.id}", "${aws_iam_role.kafka-register.id}", "${aws_iam_role.memberships.id}", "${aws_iam_role.notifications.id}", "${aws_iam_role.opps.id}", "${aws_iam_role.organizers.id}", "${aws_iam_role.profiles.id}", "${aws_iam_role.projects.id}", "${aws_iam_role.s3Writer.id}", "${aws_iam_role.sendgrid.id}", "${aws_iam_role.teams.id}", "${aws_iam_role.users.id}"]
+  roles = ["${aws_iam_role.arrivals.id}", "${aws_iam_role.assignments.id}", "${aws_iam_role.commitments.id}", "${aws_iam_role.dns-register.id}", "${aws_iam_role.engagements.id}", "${aws_iam_role.engagementsNotifications.id}", "${aws_iam_role.engagementsPayment.id}", "${aws_iam_role.engagementsPaymentToken.id}", "${aws_iam_role.engagementsReclaim.id}", "${aws_iam_role.firebase.id}", "${aws_iam_role.fulfillers.id}", "${aws_iam_role.gatewayCustomer.id}", "${aws_iam_role.memberships.id}", "${aws_iam_role.notifications.id}", "${aws_iam_role.opps.id}", "${aws_iam_role.organizers.id}", "${aws_iam_role.profiles.id}", "${aws_iam_role.projects.id}", "${aws_iam_role.s3Writer.id}", "${aws_iam_role.sendgrid.id}", "${aws_iam_role.teams.id}", "${aws_iam_role.users.id}"]
 }
 resource "aws_iam_policy_attachment" "write-to-data-emails" {
   name = "write-to-data-emails-attachment"
   policy_arn = "${aws_iam_policy.write-to-data-emails.arn}"
-  roles = ["${aws_iam_role.arrivals.id}", "${aws_iam_role.assignments.id}", "${aws_iam_role.commitments.id}", "${aws_iam_role.dns-register.id}", "${aws_iam_role.engagements.id}", "${aws_iam_role.engagementsNotifications.id}", "${aws_iam_role.engagementsPayment.id}", "${aws_iam_role.engagementsPaymentToken.id}", "${aws_iam_role.engagementsReclaim.id}", "${aws_iam_role.firebase.id}", "${aws_iam_role.fulfillers.id}", "${aws_iam_role.gatewayCustomer.id}", "${aws_iam_role.kafka-register.id}", "${aws_iam_role.memberships.id}", "${aws_iam_role.notifications.id}", "${aws_iam_role.opps.id}", "${aws_iam_role.organizers.id}", "${aws_iam_role.profiles.id}", "${aws_iam_role.projects.id}", "${aws_iam_role.s3Writer.id}", "${aws_iam_role.sendgrid.id}", "${aws_iam_role.teams.id}", "${aws_iam_role.users.id}"]
+  roles = ["${aws_iam_role.arrivals.id}", "${aws_iam_role.assignments.id}", "${aws_iam_role.commitments.id}", "${aws_iam_role.dns-register.id}", "${aws_iam_role.engagements.id}", "${aws_iam_role.engagementsNotifications.id}", "${aws_iam_role.engagementsPayment.id}", "${aws_iam_role.engagementsPaymentToken.id}", "${aws_iam_role.engagementsReclaim.id}", "${aws_iam_role.firebase.id}", "${aws_iam_role.fulfillers.id}", "${aws_iam_role.gatewayCustomer.id}", "${aws_iam_role.memberships.id}", "${aws_iam_role.notifications.id}", "${aws_iam_role.opps.id}", "${aws_iam_role.organizers.id}", "${aws_iam_role.profiles.id}", "${aws_iam_role.projects.id}", "${aws_iam_role.s3Writer.id}", "${aws_iam_role.sendgrid.id}", "${aws_iam_role.teams.id}", "${aws_iam_role.users.id}"]
 }

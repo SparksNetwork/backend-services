@@ -29,8 +29,17 @@ Once created it will prompt you to download the key. Save it and copy it to this
 
 Install docker. For mac: https://docker.github.io/docker-for-mac
 
+### npm modules
+
+You'll probably get better results with yarn:
+
+```
+npm install -g yarn
+yarn install
+```
+
 ## Now to run this up:
 
 ```
-node bin/local.js
+npm run local
 ```

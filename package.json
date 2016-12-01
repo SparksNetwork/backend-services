@@ -44,7 +44,7 @@
     "apex.js": "^2.0.0",
     "aws-sdk": "2.7.9",
     "bluebird": "^3.4.6",
-    "braintree": "^1.42.0",
+    "braintree": "^1.43.0",
     "farmhash": "^1.2.1",
     "firebase": "^3.6.2",
     "firebase-get": "github:jemmyw/firebase-get",

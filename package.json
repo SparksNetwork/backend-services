@@ -46,7 +46,7 @@
     "bluebird": "^3.4.6",
     "braintree": "^1.42.0",
     "farmhash": "^1.2.1",
-    "firebase": "^3.4.1",
+    "firebase": "^3.6.2",
     "firebase-get": "github:jemmyw/firebase-get",
     "kinesis": "^1.2.2",
     "kinesis-readable": "^1.0.0",

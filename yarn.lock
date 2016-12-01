@@ -248,15 +248,15 @@ async.util.setimmediate@0.5.2:
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/async.util.setimmediate/-/async.util.setimmediate-0.5.2.tgz#2812ebabf2a58027758d4bc7793d1ccfaf10255f"
 
+async@2.1.4:
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/async/-/async-2.1.4.tgz#2d2160c7788032e4dd6cbe2502f1f9a2c8f6cde4"
+  dependencies:
+    lodash "^4.14.0"
+
 async@^0.9.0:
   version "0.9.2"
   resolved "https://registry.yarnpkg.com/async/-/async-0.9.2.tgz#aea74d5e61c1f899613bf64bda66d4c78f2fd17d"
-
-async@^2.1.2:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/async/-/async-2.1.2.tgz#612a4ab45ef42a70cde806bad86ee6db047e8385"
-  dependencies:
-    lodash "^4.14.0"
 
 asynckit@^0.4.0:
   version "0.4.0"
@@ -369,17 +369,17 @@ ava@^0.17.0:
     unique-temp-dir "^1.0.0"
     update-notifier "^1.0.0"
 
-aws-sdk-mock@^1.5.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk-mock/-/aws-sdk-mock-1.5.0.tgz#eff4e24429231a363d21c795b9269cc47bc5dee8"
+aws-sdk-mock@1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/aws-sdk-mock/-/aws-sdk-mock-1.6.1.tgz#79dce665a8295f76fde7afa7b4a6ca03e1afaa62"
   dependencies:
     aws-sdk "^2.3.0"
     sinon "^1.17.3"
     traverse "^0.6.6"
 
-aws-sdk@^2.2.22, aws-sdk@^2.3.0, aws-sdk@^2.7.5:
-  version "2.7.5"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.7.5.tgz#dac87896459bd4ca3f593fa65478ff43ee1843af"
+aws-sdk@2.7.9, aws-sdk@^2.2.22, aws-sdk@^2.3.0:
+  version "2.7.9"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.7.9.tgz#7137ab50613625a049a4eb575e1425babeea8ff6"
   dependencies:
     buffer "4.9.1"
     crypto-browserify "1.0.9"
@@ -387,6 +387,7 @@ aws-sdk@^2.2.22, aws-sdk@^2.3.0, aws-sdk@^2.7.5:
     querystring "0.2.0"
     sax "1.1.5"
     url "0.10.3"
+    uuid "3.0.0"
     xml2js "0.4.15"
     xmlbuilder "2.6.2"
 
@@ -4497,6 +4498,10 @@ util@0.10.3, "util@>=0.10.3 <1", util@~0.10.1:
   resolved "https://registry.yarnpkg.com/util/-/util-0.10.3.tgz#7afb1afe50805246489e3db7fe0ed379336ac0f9"
   dependencies:
     inherits "2.0.1"
+
+uuid@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.0.0.tgz#6728fc0459c450d796a99c31837569bdf672d728"
 
 uuid@^2.0.1:
   version "2.0.3"

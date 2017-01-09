@@ -40,7 +40,7 @@
     "typings": "^1.4.0"
   },
   "dependencies": {
-    "@sparksnetwork/sparks-schemas": "^2.1.7",
+    "@sparksnetwork/sparks-schemas": "^2.1.9",
     "ajv": "^4.9.0",
     "apex.js": "^2.0.0",
     "aws-sdk": "2.7.9",

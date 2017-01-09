@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@sparksnetwork/sparks-schemas@^2.1.7":
-  version "2.1.7"
-  resolved "https://registry.yarnpkg.com/@sparksnetwork/sparks-schemas/-/sparks-schemas-2.1.7.tgz#c942b60e9c73b4a3b243efed0092565baf90941c"
+"@sparksnetwork/sparks-schemas@^2.1.9":
+  version "2.1.9"
+  resolved "https://registry.yarnpkg.com/@sparksnetwork/sparks-schemas/-/sparks-schemas-2.1.9.tgz#9f1775dd4919f8bfe69330934d57f992768e53d0"
   dependencies:
     ajv "^4.7.7"
     glob "^7.1.1"

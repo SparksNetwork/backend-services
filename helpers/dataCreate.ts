@@ -1,4 +1,4 @@
-import {CreateData} from 'sparks-schemas/types/data'
+import {CreateData} from '@sparksnetwork/sparks-schemas/types/data'
 import {StreamRecord} from "../lib/StreamPublish";
 
 export function dataCreate(domain:string, key:string, partitionKey:string, values:any):StreamRecord<CreateData<any>> {

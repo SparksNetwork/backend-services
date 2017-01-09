@@ -1,6 +1,6 @@
 import service from './index';
-import {ProfilesCreateCommand, ProfilesCreatePayload} from 'sparks-schemas/types/commands/ProfilesCreate'
-import {ProfilesUpdateCommand, ProfilesUpdatePayload} from 'sparks-schemas/types/commands/ProfilesUpdate'
+import {ProfilesCreateCommand, ProfilesCreatePayload} from '@sparksnetwork/sparks-schemas/types/commands/ProfilesCreate'
+import {ProfilesUpdateCommand, ProfilesUpdatePayload} from '@sparksnetwork/sparks-schemas/types/commands/ProfilesUpdate'
 import {test} from "ava";
 import {StreamTransform} from "../../test/StreamTransform";
 import {MockFirebase} from "../../test/MockFirebase";

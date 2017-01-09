@@ -1,6 +1,6 @@
 import * as apex from 'apex.js';
 import {StreamTransform} from "../../lib/StreamTransform";
-import {data} from 'sparks-schemas/generators/data';
+import {data} from '@sparksnetwork/sparks-schemas/generators/data';
 import {whereEq, both, compose, prop} from 'ramda';
 import {dataCreate} from "../../helpers/dataCreate";
 import {dataRemove} from "../../helpers/dataRemove";

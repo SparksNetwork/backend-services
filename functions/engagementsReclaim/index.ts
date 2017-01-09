@@ -1,10 +1,10 @@
 import * as assert from 'assert'
 import {values} from 'ramda';
 import {StreamTransform} from "../../lib/StreamTransform";
-import {EngagementsReclaimCommand} from 'sparks-schemas/types/commands/EngagementsReclaim';
+import {EngagementsReclaimCommand} from '@sparksnetwork/sparks-schemas/types/commands/EngagementsReclaim';
 import {BraintreeGateway} from "../../lib/ExternalFactories/Braintree";
 import {lookup, search} from "../../lib/ExternalFactories/Firebase";
-import {Engagement} from "sparks-schemas/types/models/engagement";
+import {Engagement} from '@sparksnetwork/sparks-schemas/types/models/engagement';
 import {
   SubscriptionUpdateOptions, SubscriptionAddOn, Subscription
 } from "../../typings/braintree";

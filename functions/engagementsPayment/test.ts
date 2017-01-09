@@ -1,10 +1,10 @@
 import service from './index';
 import {mock, spy} from 'sinon';
 import {test} from 'ava';
-import {EngagementsPayCommand} from 'sparks-schemas/types/commands/EngagementsPay'
-import {EngagementsConfirmCommand} from 'sparks-schemas/types/commands/EngagementsConfirm'
+import {EngagementsPayCommand} from '@sparksnetwork/sparks-schemas/types/commands/EngagementsPay'
+import {EngagementsConfirmCommand} from '@sparksnetwork/sparks-schemas/types/commands/EngagementsConfirm'
 import {StreamTransform} from "../../test/StreamTransform";
-import Ajv from 'sparks-schemas/lib/ajv';
+import Ajv from '@sparksnetwork/sparks-schemas/lib/ajv';
 import {BraintreeGateway} from "../../lib/ExternalFactories/Braintree";
 import {MockFirebase} from "../../test/MockFirebase";
 import {establishConnection} from "../../lib/ExternalFactories/Firebase";

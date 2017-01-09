@@ -2,6 +2,14 @@
 # yarn lockfile v1
 
 
+"@sparksnetwork/sparks-schemas@^2.1.7":
+  version "2.1.7"
+  resolved "https://registry.yarnpkg.com/@sparksnetwork/sparks-schemas/-/sparks-schemas-2.1.7.tgz#c942b60e9c73b4a3b243efed0092565baf90941c"
+  dependencies:
+    ajv "^4.7.7"
+    glob "^7.1.1"
+    inflection "^1.10.0"
+
 "@types/node@^6.0.48":
   version "6.0.48"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.48.tgz#86ccc15f66b73cbbc5eb3483398936c585122b3c"
@@ -4009,13 +4017,7 @@ source-map-support@0.2.9:
   dependencies:
     source-map "0.1.32"
 
-source-map-support@^0.4.0, source-map-support@^0.4.2:
-  version "0.4.5"
-  resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.4.5.tgz#4438df4219e1b3c7feb674614b4c67f9722db1e4"
-  dependencies:
-    source-map "^0.5.3"
-
-source-map-support@^0.4.6:
+source-map-support@^0.4.0, source-map-support@^0.4.2, source-map-support@^0.4.6:
   version "0.4.6"
   resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.4.6.tgz#32552aa64b458392a85eab3b0b5ee61527167aeb"
   dependencies:
@@ -4026,14 +4028,6 @@ source-map@0.1.32:
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.1.32.tgz#c8b6c167797ba4740a8ea33252162ff08591b266"
   dependencies:
     amdefine ">=0.0.4"
-
-"sparks-schemas@github:sparksnetwork/schemas":
-  version "2.1.5"
-  resolved "https://codeload.github.com/sparksnetwork/schemas/tar.gz/3bca29da275b169134fa91d55f8d529c549e5fb2"
-  dependencies:
-    ajv "^4.7.7"
-    glob "^7.1.1"
-    inflection "^1.10.0"
 
 spdx-correct@~1.0.0:
   version "1.0.2"

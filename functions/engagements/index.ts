@@ -1,6 +1,6 @@
 import * as apex from 'apex.js';
 import {spread} from "../../lib/spread";
-import {EngagementsCreateCommand} from 'sparks-schemas/types/commands/EngagementsCreate';
+import {EngagementsCreateCommand} from '@sparksnetwork/sparks-schemas/types/commands/EngagementsCreate';
 import {StreamTransform} from "../../lib/StreamTransform";
 import {UpdateTransform} from "../../helpers/CommandToDataTransform";
 import {dataUpdate} from "../../helpers/dataUpdate";

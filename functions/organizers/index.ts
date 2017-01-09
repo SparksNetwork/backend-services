@@ -1,12 +1,12 @@
 import {merge} from 'ramda';
 import {RemoveTransform} from "../../helpers/CommandToDataTransform";
 import {StreamTransform} from "../../lib/StreamTransform";
-import {OrganizersAcceptCommand} from 'sparks-schemas/types/commands/OrganizersAccept';
-import {OrganizersCreateCommand} from 'sparks-schemas/types/commands/OrganizersCreate';
-import {OrganizerInviteEmail} from 'sparks-schemas/types/emails/organizerInvite';
-import {CreateData} from 'sparks-schemas/types/data';
+import {OrganizersAcceptCommand} from '@sparksnetwork/sparks-schemas/types/commands/OrganizersAccept';
+import {OrganizersCreateCommand} from '@sparksnetwork/sparks-schemas/types/commands/OrganizersCreate';
+import {OrganizerInviteEmail} from '@sparksnetwork/sparks-schemas/types/emails/organizerInvite';
+import {CreateData} from '@sparksnetwork/sparks-schemas/types/data';
 import {lookup, firebaseUid} from '../../lib/ExternalFactories/Firebase';
-import {Organizer} from "sparks-schemas/types/models/organizer";
+import {Organizer} from "@sparksnetwork/sparks-schemas/types/models/organizer";
 import {dataUpdate} from "../../helpers/dataUpdate";
 import {λ} from "../../lib/lambda";
 

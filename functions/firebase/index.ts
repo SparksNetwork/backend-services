@@ -1,7 +1,7 @@
-import {CreateData, UpdateData, RemoveData} from 'sparks-schemas/types/data'
+import {CreateData, UpdateData, RemoveData} from '@sparksnetwork/sparks-schemas/types/data'
 import {ref} from '../../lib/ExternalFactories/Firebase';
 import {StreamFunction} from "../../lib/StreamFunction";
-import Ajv from 'sparks-schemas/lib/ajv';
+import Ajv from '@sparksnetwork/sparks-schemas/lib/ajv';
 import {λ} from "../../lib/lambda";
 
 const ajv = Ajv();

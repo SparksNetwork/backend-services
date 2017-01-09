@@ -1,7 +1,7 @@
 import service from './index';
 import {test} from 'ava';
-import {EngagementsCreateCommand} from 'sparks-schemas/types/commands/EngagementsCreate';
-import {EngagementsUpdateCommand} from 'sparks-schemas/types/commands/EngagementsUpdate';
+import {EngagementsCreateCommand} from '@sparksnetwork/sparks-schemas/types/commands/EngagementsCreate';
+import {EngagementsUpdateCommand} from '@sparksnetwork/sparks-schemas/types/commands/EngagementsUpdate';
 import {StreamTransform} from "../../test/StreamTransform";
 
 test.serial('engagements create', async function(t) {

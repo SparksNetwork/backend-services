@@ -1,5 +1,5 @@
-import Ajv from 'sparks-schemas/lib/ajv';
-import {command} from 'sparks-schemas/generators/command';
+import Ajv from '@sparksnetwork/sparks-schemas/lib/ajv';
+import {command} from '@sparksnetwork/sparks-schemas/generators/command';
 import ValidateFunction = ajv.ValidateFunction;
 import {view, lensPath, unnest} from 'ramda';
 import {error, debug} from "./log";

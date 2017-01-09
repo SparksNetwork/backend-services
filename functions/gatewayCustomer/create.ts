@@ -1,7 +1,6 @@
 import {StreamTransform} from "../../lib/StreamTransform";
-import {CreateData} from 'sparks-schemas/types/data';
-import {Profile} from "sparks-schemas/types/models/profile";
-import {data} from 'sparks-schemas/generators/data';
+import {CreateData} from '@sparksnetwork/sparks-schemas/types/data';
+import {Profile} from '@sparksnetwork/sparks-schemas/types/models/profile';
 import {BraintreeGateway} from "../../lib/ExternalFactories/Braintree";
 import {applySpec, propOr, head, split, last, prop, compose} from 'ramda';
 import {CustomerOptions} from "../../typings/braintree";

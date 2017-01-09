@@ -1,8 +1,8 @@
 import {StreamTransform} from "../../lib/StreamTransform";
 import {lookup, search} from "../../lib/ExternalFactories/Firebase";
-import {Engagement} from 'sparks-schemas/types/models/engagement';
-import {EngagementPayment} from 'sparks-schemas/types/models/EngagementPayment';
-import {EngagementsPayCommand} from 'sparks-schemas/types/commands/EngagementsPay';
+import {Engagement} from '@sparksnetwork/sparks-schemas/types/models/engagement';
+import {EngagementPayment} from '@sparksnetwork/sparks-schemas/types/models/EngagementPayment';
+import {EngagementsPayCommand} from '@sparksnetwork/sparks-schemas/types/commands/EngagementsPay';
 import {oppPayment} from "../../lib/domain/Opp";
 import {values} from 'ramda';
 import {BraintreeGateway} from "../../lib/ExternalFactories/Braintree";

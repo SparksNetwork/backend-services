@@ -40,6 +40,7 @@
     "typings": "^1.4.0"
   },
   "dependencies": {
+    "@sparksnetwork/sparks-schemas": "^2.1.7",
     "ajv": "^4.9.0",
     "apex.js": "^2.0.0",
     "aws-sdk": "2.7.9",
@@ -55,7 +56,6 @@
     "rxjs": "5.0.0-beta.12",
     "sendgrid": "4.7.0",
     "source-map-support": "^0.4.6",
-    "sparks-schemas": "github:sparksnetwork/schemas",
     "unique-stream": "^2.2.1"
   }
 }

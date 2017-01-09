@@ -1,6 +1,6 @@
-import {PaymentDue} from 'sparks-schemas/types/models/paymentDue';
+import {PaymentDue} from '@sparksnetwork/sparks-schemas/types/models/paymentDue';
 import {reduce, compose, propEq, either, filter} from 'ramda';
-import {Commitment} from "sparks-schemas/types/models/commitment";
+import {Commitment} from "@sparksnetwork/sparks-schemas/types/models/commitment";
 
 const SPARKS_RATE = 0.035;
 const SPARKS_MIN = 1.0;

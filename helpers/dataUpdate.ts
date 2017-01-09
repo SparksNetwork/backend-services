@@ -1,4 +1,4 @@
-import {UpdateData} from 'sparks-schemas/types/data'
+import {UpdateData} from '@sparksnetwork/sparks-schemas/types/data'
 import {StreamRecord} from "../lib/StreamPublish";
 
 /**

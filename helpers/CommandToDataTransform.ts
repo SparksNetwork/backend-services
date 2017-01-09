@@ -1,5 +1,5 @@
 import {StreamTransform} from "../lib/StreamTransform";
-import {Command} from "sparks-schemas/types/command";
+import {Command} from "@sparksnetwork/sparks-schemas/types/command";
 import {spread} from "../lib/spread";
 import {firebaseUid} from "../lib/ExternalFactories/Firebase";
 import {identity} from 'ramda';

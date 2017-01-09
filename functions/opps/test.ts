@@ -1,8 +1,8 @@
 import {test} from 'ava';
 import service from './index';
-import {OppsCreateCommand} from 'sparks-schemas/types/commands/OppsCreate';
-import {OppsUpdateCommand} from 'sparks-schemas/types/commands/OppsUpdate';
-import {OppsRemoveCommand} from 'sparks-schemas/types/commands/OppsRemove';
+import {OppsCreateCommand} from '@sparksnetwork/sparks-schemas/types/commands/OppsCreate';
+import {OppsUpdateCommand} from '@sparksnetwork/sparks-schemas/types/commands/OppsUpdate';
+import {OppsRemoveCommand} from '@sparksnetwork/sparks-schemas/types/commands/OppsRemove';
 import {StreamTransform} from "../../test/StreamTransform";
 
 const createCommand:OppsCreateCommand = {

@@ -1,7 +1,7 @@
 import {test} from 'ava';
 import service from './index';
-import {FulfillersCreateCommand} from 'sparks-schemas/types/commands/FulfillersCreate';
-import {FulfillersRemoveCommand} from 'sparks-schemas/types/commands/FulfillersRemove';
+import {FulfillersCreateCommand} from '@sparksnetwork/sparks-schemas/types/commands/FulfillersCreate';
+import {FulfillersRemoveCommand} from '@sparksnetwork/sparks-schemas/types/commands/FulfillersRemove';
 import {StreamTransform} from "../../test/StreamTransform";
 
 const createCommand:FulfillersCreateCommand = {

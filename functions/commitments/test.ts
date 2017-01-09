@@ -1,7 +1,7 @@
 import {test} from 'ava';
 import service from './index';
-import {CommitmentsUpdateCommand} from 'sparks-schemas/types/commands/CommitmentsUpdate';
-import {CommitmentsRemoveCommand} from 'sparks-schemas/types/commands/CommitmentsRemove';
+import {CommitmentsUpdateCommand} from '@sparksnetwork/sparks-schemas/types/commands/CommitmentsUpdate';
+import {CommitmentsRemoveCommand} from '@sparksnetwork/sparks-schemas/types/commands/CommitmentsRemove';
 import {StreamTransform} from "../../test/StreamTransform";
 
 const createCommand = {

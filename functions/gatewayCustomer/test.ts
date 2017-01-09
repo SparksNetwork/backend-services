@@ -6,8 +6,6 @@ import {StreamFunction} from "../../test/StreamFunction";
 import {BraintreeGateway} from "../../lib/ExternalFactories/Braintree";
 import {MockFirebase} from "../../test/MockFirebase";
 import {establishConnection} from "../../lib/ExternalFactories/Firebase";
-import Ajv from 'sparks-schemas/lib/ajv';
-const ajv = Ajv();
 
 const braintree = {
   customer: {

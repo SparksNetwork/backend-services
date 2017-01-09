@@ -1,4 +1,4 @@
-import {RemoveData} from 'sparks-schemas/types/data'
+import {RemoveData} from '@sparksnetwork/sparks-schemas/types/data'
 import {StreamRecord} from "../lib/StreamPublish";
 
 /**

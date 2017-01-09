@@ -1,6 +1,6 @@
 import {StreamTransform} from "../../lib/StreamTransform";
-import {ArrivalsCreateCommand, ArrivalsCreatePayload} from 'sparks-schemas/types/commands/ArrivalsCreate';
-import {Arrival} from "sparks-schemas/types/models/arrival";
+import {ArrivalsCreateCommand, ArrivalsCreatePayload} from '@sparksnetwork/sparks-schemas/types/commands/ArrivalsCreate';
+import {Arrival} from '@sparksnetwork/sparks-schemas/types/models/arrival';
 import {lookup} from "../../lib/ExternalFactories/Firebase";
 import {RemoveTransform} from "../../helpers/CommandToDataTransform";
 import {dataCreate} from "../../helpers/dataCreate";

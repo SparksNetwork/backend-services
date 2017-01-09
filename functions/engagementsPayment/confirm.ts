@@ -1,7 +1,7 @@
 import {StreamTransform} from "../../lib/StreamTransform";
-import {EngagementsConfirmCommand} from 'sparks-schemas/types/commands/EngagementsConfirm'
+import {EngagementsConfirmCommand} from '@sparksnetwork/sparks-schemas/types/commands/EngagementsConfirm'
 import {lookup, search} from "../../lib/ExternalFactories/Firebase";
-import {Engagement} from "sparks-schemas/types/models/engagement";
+import {Engagement} from '@sparksnetwork/sparks-schemas/types/models/engagement';
 import {oppPayment} from "../../lib/domain/Opp";
 import {values} from 'ramda';
 import {dataUpdate} from "../../helpers/dataUpdate";

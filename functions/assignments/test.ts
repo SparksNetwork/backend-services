@@ -1,5 +1,5 @@
-import {AssignmentsCreateCommand} from 'sparks-schemas/types/commands/AssignmentsCreate';
-import {AssignmentsRemoveCommand} from 'sparks-schemas/types/commands/AssignmentsRemove';
+import {AssignmentsCreateCommand} from '@sparksnetwork/sparks-schemas/types/commands/AssignmentsCreate';
+import {AssignmentsRemoveCommand} from '@sparksnetwork/sparks-schemas/types/commands/AssignmentsRemove';
 import {test} from 'ava';
 import service from './index';
 import {StreamTransform} from "../../test/StreamTransform";

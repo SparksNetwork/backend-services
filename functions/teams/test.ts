@@ -2,9 +2,9 @@ require('source-map-support').install();
 
 import service from './index';
 import {test} from 'ava';
-import {TeamsCreateCommand} from 'sparks-schemas/types/commands/TeamsCreate'
-import {TeamsUpdateCommand} from 'sparks-schemas/types/commands/TeamsUpdate'
-import {TeamsRemoveCommand} from 'sparks-schemas/types/commands/TeamsRemove'
+import {TeamsCreateCommand} from '@sparksnetwork/sparks-schemas/types/commands/TeamsCreate'
+import {TeamsUpdateCommand} from '@sparksnetwork/sparks-schemas/types/commands/TeamsUpdate'
+import {TeamsRemoveCommand} from '@sparksnetwork/sparks-schemas/types/commands/TeamsRemove'
 import {StreamTransform} from "../../test/StreamTransform";
 import {MockFirebase} from "../../test/MockFirebase";
 import {establishConnection} from "../../lib/ExternalFactories/Firebase";

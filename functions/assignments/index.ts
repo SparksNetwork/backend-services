@@ -1,6 +1,6 @@
 import * as apex from 'apex.js';
 import {StreamTransform} from "../../lib/StreamTransform";
-import {AssignmentsCreateCommand} from 'sparks-schemas/types/commands/AssignmentsCreate';
+import {AssignmentsCreateCommand} from '@sparksnetwork/sparks-schemas/types/commands/AssignmentsCreate';
 import {RemoveTransform} from "../../helpers/CommandToDataTransform";
 import {dataCreate} from "../../helpers/dataCreate";
 import {spread} from "../../lib/spread";

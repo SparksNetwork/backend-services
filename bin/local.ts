@@ -196,7 +196,7 @@ const tasks = new Listr([
         {
           title: 'schemas.json',
           task: () => {
-            return execa('cp', ['node_modules/sparks-schemas/schemas.json', 'schemas.json']);
+            return execa('cp', ['node_modules/@sparksnetwork/sparks-schemas/schemas.json', 'schemas.json']);
           }
         },
         {

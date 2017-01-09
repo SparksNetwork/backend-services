@@ -1,5 +1,5 @@
 import * as apex from 'apex.js';
-import {UsersMigrateCommand} from 'sparks-schemas/types/commands/UsersMigrate';
+import {UsersMigrateCommand} from '@sparksnetwork/sparks-schemas/types/commands/UsersMigrate';
 import {StreamTransform} from "../../lib/StreamTransform";
 import {dataCreate} from "../../helpers/dataCreate";
 import {dataUpdate} from "../../helpers/dataUpdate";

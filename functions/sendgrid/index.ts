@@ -1,7 +1,7 @@
 import * as apex from 'apex.js';
 import {StreamFunction} from "../../lib/StreamFunction";
-import {email} from "sparks-schemas/generators/email";
-import {TransactionEmail} from 'sparks-schemas/types/transactionEmail'
+import {email} from "@sparksnetwork/sparks-schemas/generators/email";
+import {TransactionEmail} from '@sparksnetwork/sparks-schemas/types/transactionEmail'
 import {sendgrid} from "../../lib/ExternalFactories/Sendgrid";
 import {assoc} from 'ramda'
 

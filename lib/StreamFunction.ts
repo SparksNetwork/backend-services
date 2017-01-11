@@ -130,6 +130,22 @@ async function kafkaFunction(e, context:KafkaContext, validator, fn:LambdaFuncti
   }
 }
 
+async function localFunction(e, context:LocalContext, validator, fn:LambdaFunction<any>):Promise<any[]> {
+  const valid = validator(e);
+
+  if (valid) {
+    error(e);
+    return await fn(e, context);
+  } else if (validator.schema) {
+    showInvalidReason(
+      validator.schema.id,
+      validator,
+      [e]
+    );
+    return ;
+  }
+}
+
 export function StreamFunction<T>(schema: ValidationArg, fn:LambdaFunction<any>) {
   const schemaPromise = createValidationFunction(schema);
 
@@ -142,10 +158,13 @@ export function StreamFunction<T>(schema: ValidationArg, fn:LambdaFunction<any>)
 
     const context = view(contextPath, ctx) || 'kinesis';
 
-    if (context === 'kafka') {
-      return kafkaFunction(event, ctx.clientContext, validator, fn);
-    } else {
-      return kinesisFunction(event, validator, fn);
+    switch(context) {
+      case 'kafka':
+        return kafkaFunction(event, ctx.clientContext, validator, fn);
+      case 'local':
+        return localFunction(event, ctx.clientContext, validator, fn);
+      default:
+        return kinesisFunction(event, validator, fn);
     }
   };
 }

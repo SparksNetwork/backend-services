@@ -1,5 +1,5 @@
 declare interface ClientContext {
-  context: 'kafka' | 'kinesis'
+  context: 'kafka' | 'kinesis' | 'local'
 }
 
 declare interface KafkaContext extends ClientContext {
@@ -10,4 +10,8 @@ declare interface KafkaContext extends ClientContext {
 
 declare interface KinesisContext extends ClientContext {
   context: 'kinesis';
+}
+
+declare interface LocalContext extends ClientContext {
+  context: 'local';
 }

@@ -17,7 +17,9 @@ export function firebase(serviceName:string, fn:(...args:any[]) => Promise<any>)
     try {
       return await fn(...givenArgs);
     } finally {
-      await getConnection().delete();
+      try {
+        await getConnection().delete();
+      } catch(err) {}
       connection = null;
     }
   }

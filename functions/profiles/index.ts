@@ -1,7 +1,7 @@
 import {StreamTransform} from "../../lib/StreamTransform";
 import {
   ProfilesCreateCommand,
-} from 'sparks-schemas/types/commands/ProfilesCreate';
+} from '@sparksnetwork/sparks-schemas/types/commands/ProfilesCreate';
 import {ProfilesUpdateCommand} from '@sparksnetwork/sparks-schemas/types/commands/ProfilesUpdate';
 import {search} from "../../lib/ExternalFactories/Firebase";
 import {merge} from 'ramda'

@@ -71,7 +71,7 @@ function showInvalidReason(domainAction:string, schemaFn:SchemaFunction, message
     debug(domainAction, 'message did not pass validation');
     schemaFn(message);
     if (schemaFn.errors) {
-      error(schemaFn.errors);
+      error('schema errors', schemaFn.errors);
     }
     debug(message);
   });
@@ -118,7 +118,6 @@ async function kafkaFunction(e, context:KafkaContext, validator, fn:LambdaFuncti
   const valid = validator(e);
 
   if (valid) {
-    error(e);
     return await fn(e, context);
   } else if (validator.schema) {
     showInvalidReason(
@@ -134,7 +133,6 @@ async function localFunction(e, context:LocalContext, validator, fn:LambdaFuncti
   const valid = validator(e);
 
   if (valid) {
-    error(e);
     return await fn(e, context);
   } else if (validator.schema) {
     showInvalidReason(

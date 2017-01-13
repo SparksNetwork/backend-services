@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-interface ServerFunction {
+export interface ServerFunction {
   name:string;
   stream:string;
   schemas:string[];

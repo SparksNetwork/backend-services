@@ -1,7 +1,6 @@
 machine:
   pre:
     - mkdir ~/.yarn-cache
-    - curl -o- -L https://yarnpkg.com/install.sh | bash
   node:
     version: 6.7.0
   services:
